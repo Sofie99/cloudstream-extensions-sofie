@@ -25,30 +25,57 @@ class Moviebox : MainAPI() {
         TvType.AsianDrama
     )
 
-    override val mainPage = mainPageOf(
-        "872031290915189720" to "Trending Now",
-        "997144265920760504" to "Popular Movie",
-        "5283462032510044280" to "Drama Indonesia Terkini",
-        "6528093688173053896" to "Trending Indonesian Movies",
-        "4380734070238626200" to "K-Drama",
-        "7736026911486755336" to "Western TV",
-        "8624142774394406504" to "Most Popular C-Drama",
-        "5404290953194750296" to "Trending Anime",
-        "5848753831881965888" to "Indonesian Horror Stories",
-        "1164329479448281992" to "Thai-Drama",
-        "7132534597631837112" to "Animated Film",
+//    override val mainPage = mainPageOf(
+//        "872031290915189720" to "Trending Now",
+//        "997144265920760504" to "Popular Movie",
+//        "5283462032510044280" to "Drama Indonesia Terkini",
+//        "6528093688173053896" to "Trending Indonesian Movies",
+//        "4380734070238626200" to "K-Drama",
+//        "7736026911486755336" to "Western TV",
+//        "8624142774394406504" to "Most Popular C-Drama",
+//        "5404290953194750296" to "Trending Anime",
+//        "5848753831881965888" to "Indonesian Horror Stories",
+//        "1164329479448281992" to "Thai-Drama",
+//        "7132534597631837112" to "Animated Film",
+//    )
+
+    override val mainPage: List<MainPageData> = mainPageOf(
+        "1,ForYou" to "Movie ForYou",
+        "1,Hottest" to "Movie Hottest",
+        "1,Latest" to "Movie Latest",
+        "1,Rating" to "Movie Rating",
+        "2,ForYou" to "TVShow ForYou",
+        "2,Hottest" to "TVShow Hottest",
+        "2,Latest" to "TVShow Latest",
+        "2,Rating" to "TVShow Rating",
+        "1006,ForYou" to "Animation ForYou",
+        "1006,Hottest" to "Animation Hottest",
+        "1006,Latest" to "Animation Latest",
+        "1006,Rating" to "Animation Rating",
     )
 
     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest,
     ): HomePageResponse {
-        val url =
-            "$mainUrl/wefeed-h5-bff/web/ranking-list/content?id=${request.data}&page=$page&perPage=12"
+//        val url = "$mainUrl/wefeed-h5-bff/web/ranking-list/content?id=${request.data}&page=$page&perPage=12"
+//
+//        val home = app.get(url).parsedSafe<Media>()?.data?.subjectList?.map {
+//            it.toSearchResponse(this)
+//        } ?: throw ErrorLoadingException("No Data Found")
 
-        val home = app.get(url).parsedSafe<Media>()?.data?.subjectList?.map {
-            it.toSearchResponse(this)
-        } ?: throw ErrorLoadingException("No Data Found")
+        val params = request.data.split(",")
+        val body = mapOf(
+            "channelId" to params.first(),
+            "page" to page,
+            "perPage" to "24",
+            "sort" to params.last()
+        ).toJson().toRequestBody(RequestBodyTypes.JSON.toMediaTypeOrNull())
+
+        val home = app.post("$mainUrl/wefeed-h5-bff/web/filter", requestBody = body)
+            .parsedSafe<Media>()?.data?.items?.map {
+                it.toSearchResponse(this)
+            } ?: throw ErrorLoadingException("No Data Found")
 
         return newHomePageResponse(request.name, home)
     }
@@ -266,7 +293,7 @@ class Moviebox : MainAPI() {
         fun toSearchResponse(provider: Moviebox): SearchResponse {
             return provider.newMovieSearchResponse(
                 title ?: "",
-                subjectId!!,
+                subjectId ?: "",
                 if (subjectType == 1) TvType.Movie else TvType.TvSeries,
                 false
             ) {
