@@ -655,5 +655,51 @@ object SoraExtractor : SoraStream() {
 
     }
 
+    suspend fun invokeVixsrc(
+        tmdbId: Int?,
+        season: Int?,
+        episode: Int?,
+        callback: (ExtractorLink) -> Unit,
+    ) {
+        val proxy = "https://proxy.heistotron.uk"
+        val type = if (season == null) "movie" else "tv"
+        val url = if (season == null) {
+            "$vixsrcAPI/$type/$tmdbId"
+        } else {
+            "$vixsrcAPI/$type/$tmdbId/$season/$episode"
+        }
+
+        val res = app.get(url).document.selectFirst("script:containsData(window.masterPlaylist)")?.data() ?: return
+
+        val video1 = Regex("""'token':\s*'(\w+)'[\S\s]+'expires':\s*'(\w+)'[\S\s]+url:\s*'(\S+)'""").find(res)?.let {
+            val (token, expires, path) = it.destructured
+            "$path?token=$token&expires=$expires&h=1&lang=en"
+        } ?: return
+
+        val video2 = "$proxy/p/${base64Encode("$proxy/api/proxy/m3u8?url=${encode(video1)}&source=sakura|ananananananananaBatman!".toByteArray())}"
+
+        listOf(
+            VixsrcSource("Vixsrc",video1,url),
+            VixsrcSource("Mapple",video2, "$mappleAPI/"),
+        ).map {
+            callback.invoke(
+                newExtractorLink(
+                    it.name,
+                    it.name,
+                    it.url,
+                    ExtractorLinkType.M3U8
+                ) {
+                    this.referer = it.referer
+                    this.headers = mapOf(
+                        "Accept" to "*/*"
+                    )
+                }
+            )
+        }
+
+
+
+    }
+
 }
 

@@ -11,6 +11,12 @@ data class TmdbDate(
     val nextWeek: String,
 )
 
+data class VixsrcSource(
+    val name: String,
+    val url: String,
+    val referer: String,
+)
+
 data class WyzieSubtitle(
     @JsonProperty("display") val display: String? = null,
     @JsonProperty("url") val url: String? = null,
