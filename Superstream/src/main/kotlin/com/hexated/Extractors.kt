@@ -1,10 +1,11 @@
 package com.hexated
 
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.mvvm.normalSafeApiCall
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import kotlinx.coroutines.runBlocking
-import java.net.URL
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 object Extractors : Superstream() {
 
@@ -71,8 +72,9 @@ object Extractors : Superstream() {
         episode: Int? = null,
         callback: (ExtractorLink) -> Unit,
     ) {
+        val UI_COOKIES = base64Decode("ZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKSVV6STFOaUo5LmV5SnBZWFFpT2pFM05UZ3dOakU0TkRVc0ltNWlaaUk2TVRjMU9EQTJNVGcwTlN3aVpYaHdJam94TnpnNU1UWTFPRFkxTENKa1lYUmhJanA3SW5WcFpDSTZNVEF4T0Rnek1pd2lkRzlyWlc0aU9pSXhPRFF3T0RWbVlXSXdOemt6WVRWaU5EVmpNek0zWW1FMFkyUXpZVGN4TXlKOWZRLjZfM0NvbTZvXzhxV3FCa1pyaTlabUtOVkdYRy1OSDRRVTdmaGxqZ3p0Z0U=")
         val (seasonSlug, episodeSlug) = getEpisodeSlug(season, episode)
-        val shareKey = app.get("$fourthAPI/index/share_link?id=${mediaId}&type=$type")
+        val shareKey = app.get("$thirdAPI/mbp/to_share_page?box_type=$type&mid=${mediaId}&json=1")
             .parsedSafe<ExternalResponse>()?.data?.link?.substringAfterLast("/") ?: return
 
         val headers = mapOf("Accept-Language" to "en")
@@ -88,34 +90,34 @@ object Extractors : Superstream() {
             app.get(
                 "$thirdAPI/file/file_share_list?share_key=$shareKey&parent_id=$parentId&page=1",
                 headers = headers
-            )
-                .parsedSafe<ExternalResponse>()?.data?.file_list?.filter {
-                    it.file_name?.contains("s${seasonSlug}e${episodeSlug}", true) == true
-                }
+            ).parsedSafe<ExternalResponse>()?.data?.file_list?.filter {
+                it.file_name?.contains("s${seasonSlug}e${episodeSlug}", true) == true
+            }
         } ?: return
 
-        fids.apmapIndexed { index, fileList ->
-            val player =
-                app.get("$thirdAPI/file/player?fid=${fileList.fid}&share_key=$shareKey").text
+        fids.amapIndexed { index, fileList ->
+            val player = app.post(
+                "$thirdAPI/file/player", data = mapOf(
+                    "fid" to "${fileList.fid}",
+                    "share_key" to shareKey
+                ), headers = mapOf(
+                    "X-Requested-With" to "XMLHttpRequest"
+                ), referer = "$thirdAPI/share/$shareKey", cookies = mapOf(
+                    "ui" to UI_COOKIES
+                )
+            ).text
             val sources = "sources\\s*=\\s*(.*);".toRegex().find(player)?.groupValues?.get(1)
-            val qualities = "quality_list\\s*=\\s*(.*);".toRegex().find(player)?.groupValues?.get(1)
-            listOf(sources, qualities).forEach {
-                AppUtils.tryParseJson<ArrayList<ExternalSources>>(it)?.forEach org@{ source ->
-                    val format =
-                        if (source.type == "video/mp4") ExtractorLinkType.VIDEO else ExtractorLinkType.M3U8
-                    val label = if (format == ExtractorLinkType.M3U8) "Hls" else "Mp4"
-                    if (!(source.label == "AUTO" || format == ExtractorLinkType.VIDEO)) return@org
-                    callback.invoke(
-                        ExtractorLink(
-                            "External",
-                            "External $label [Server ${index + 1}]",
-                            (source.m3u8_url ?: source.file)?.replace("\\/", "/") ?: return@org,
-                            "",
-                            getIndexQuality(if (format == ExtractorLinkType.M3U8) fileList.file_name else source.label),
-                            type = format,
-                        )
-                    )
-                }
+
+            AppUtils.tryParseJson<ArrayList<ExternalSources>>(sources)?.forEach { source ->
+                callback.invoke(
+                    newExtractorLink(
+                        this.name,
+                        if (source.label.equals("ORG")) "${this.name} ${source.label}" else this.name,
+                        source.file ?: return@forEach
+                    ) {
+                        this.quality = getQualityFromName(source.label)
+                    }
+                )
             }
         }
     }
@@ -169,49 +171,25 @@ object Extractors : Superstream() {
 
     }
 
-    suspend fun invokeOpenSubs(
-        imdbId: String? = null,
-        season: Int? = null,
-        episode: Int? = null,
-        subtitleCallback: (SubtitleFile) -> Unit,
-    ) {
-        val slug = if (season == null) {
-            "movie/$imdbId"
-        } else {
-            "series/$imdbId:$season:$episode"
-        }
-        app.get("${openSubAPI}/subtitles/$slug.json", timeout = 120L)
-            .parsedSafe<OsResult>()?.subtitles?.map { sub ->
-                subtitleCallback.invoke(
-                    SubtitleFile(
-                        SubtitleHelper.fromThreeLettersToLanguage(sub.lang ?: "") ?: sub.lang
-                        ?: return@map,
-                        sub.url ?: return@map
-                    )
-                )
-            }
-    }
-
-    suspend fun invokeVidsrcto(
+    suspend fun invokeWyzie(
         imdbId: String?,
         season: Int?,
         episode: Int?,
         subtitleCallback: (SubtitleFile) -> Unit,
     ) {
         val url = if (season == null) {
-            "$vidsrctoAPI/embed/movie/$imdbId"
+            "${wyzieAPI}/search?id=$imdbId"
         } else {
-            "$vidsrctoAPI/embed/tv/$imdbId/$season/$episode"
+            "${wyzieAPI}/search?id=$imdbId&season=$season&episode=$episode"
         }
 
-        val mediaId =
-            app.get(url).document.selectFirst("ul.episodes li a")?.attr("data-id") ?: return
-        val subtitles = app.get("$vidsrctoAPI/ajax/embed/episode/$mediaId/subtitles").text
-        AppUtils.tryParseJson<List<VidsrcSubtitles>>(subtitles)?.map {
+        val res = app.get(url).text
+
+        tryParseJson<ArrayList<WyzieSubtitle>>(res)?.map { subtitle ->
             subtitleCallback.invoke(
                 SubtitleFile(
-                    it.label ?: "",
-                    it.file ?: return@map
+                    subtitle.display ?: return@map,
+                    subtitle.url ?: return@map,
                 )
             )
         }
@@ -251,6 +229,16 @@ object Extractors : Superstream() {
         } else {
             (if (season!! < 10) "0$season" else "$season") to (if (episode!! < 10) "0$episode" else "$episode")
         }
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    fun base64DefaultEncode(byteArray: ByteArray): String {
+        return Base64.Default.encode(byteArray)
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    fun base64DefaultDecode(string: String): ByteArray {
+        return Base64.Default.decode(string)
     }
 
 }

@@ -1,12 +1,11 @@
 package com.hexated
 
-import android.util.Base64
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.hexated.Extractors.base64DefaultDecode
+import com.hexated.Extractors.base64DefaultEncode
 import com.hexated.Extractors.invokeExternalSource
-import com.hexated.Extractors.invokeInternalSource
-import com.hexated.Extractors.invokeOpenSubs
-import com.hexated.Extractors.invokeVidsrcto
 import com.hexated.Extractors.invokeWatchsomuch
+import com.hexated.Extractors.invokeWyzie
 import com.hexated.Superstream.CipherUtils.getVerify
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.APIHolder.capitalize
@@ -19,7 +18,6 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.nicehttp.NiceResponse
 import okhttp3.Interceptor
 import okhttp3.Response
-import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import javax.crypto.Cipher
@@ -104,8 +102,8 @@ open class Superstream : MainAPI() {
                     SecretKeySpec(bArr, ALGORITHM),
                     IvParameterSpec(iv.toByteArray())
                 )
-
-                String(Base64.encode(cipher.doFinal(str.toByteArray()), 2), StandardCharsets.UTF_8)
+//                String(Base64.encode(cipher.doFinal(str.toByteArray()), 2), StandardCharsets.UTF_8)
+                base64Encode(cipher.doFinal(str.toByteArray()))
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
@@ -129,7 +127,8 @@ open class Superstream : MainAPI() {
                     SecretKeySpec(bArr, ALGORITHM),
                     IvParameterSpec(iv.toByteArray())
                 )
-                val inputStr = Base64.decode(str.toByteArray(), Base64.DEFAULT)
+//                val inputStr = Base64.decode(str.toByteArray(), Base64.DEFAULT)
+                val inputStr = base64DefaultDecode(str)
                 cipher.doFinal(inputStr).decodeToString()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -213,7 +212,8 @@ open class Superstream : MainAPI() {
                     key
                 )
             }","encrypt_data":"$encryptedQuery"}"""
-        val base64Body = String(Base64.encode(newBody.toByteArray(), Base64.DEFAULT))
+//        val base64Body = String(Base64.encode(newBody.toByteArray(), Base64.DEFAULT))
+        val base64Body = base64DefaultEncode(newBody.toByteArray())
 
         val data = mapOf(
             "data" to base64Body,
@@ -221,17 +221,21 @@ open class Superstream : MainAPI() {
             "platform" to "android",
             "version" to appVersionCode,
             // Probably best to randomize this
-            "medium" to "Website&token$token"
+            "medium" to "Website",
+            "token" to token
         )
 
         val url = if (useAlternativeApi) secondAPI else firstAPI
-        return app.post(
+        val res = app.post(
             url,
             headers = headers,
             data = data,
             timeout = timeout,
-            interceptor = interceptor
+//            interceptor = interceptor
         )
+
+
+        return res
     }
 
     suspend inline fun <reified T : Any> queryApiParsed(
@@ -277,24 +281,25 @@ open class Superstream : MainAPI() {
     private val iv = base64Decode("d0VpcGhUbiE=")
     private val key = base64Decode("MTIzZDZjZWRmNjI2ZHk1NDIzM2FhMXc2")
 
-    private val firstAPI = base64Decode("aHR0cHM6Ly9zaG93Ym94LnNoZWd1Lm5ldC9hcGkvYXBpX2NsaWVudC9pbmRleC8=")
+    //    private val firstAPI = base64Decode("aHR0cHM6Ly9zaG93Ym94LnNoZWd1Lm5ldC9hcGkvYXBpX2NsaWVudC9pbmRleC8=")
+    private val firstAPI = base64Decode("aHR0cHM6Ly9zaG93Ym94YXBpc3NsLnN0c29zby5jb20vYXBpL2FwaV9jbGllbnQv")
 
     // Another url because the first one sucks at searching
     // This one was revealed to me in a dream
     private val secondAPI = base64Decode("aHR0cHM6Ly9tYnBhcGkuc2hlZ3UubmV0L2FwaS9hcGlfY2xpZW50L2luZGV4Lw==")
 
     val thirdAPI = base64Decode("aHR0cHM6Ly93d3cuZmViYm94LmNvbQ==")
-    val fourthAPI = base64Decode("aHR0cHM6Ly93d3cuc2hvd2JveC5tZWRpYQ==")
 
     val watchSomuchAPI = "https://watchsomuch.tv"
-    val openSubAPI = "https://opensubtitles-v3.strem.io"
-    val vidsrctoAPI = "https://vidsrc.to"
+    val wyzieAPI = "https://sub.wyzie.ru"
 
     private val appKey = base64Decode("bW92aWVib3g=")
     val appId = base64Decode("Y29tLnRkby5zaG93Ym94")
     private val appIdSecond = base64Decode("Y29tLm1vdmllYm94cHJvLmFuZHJvaWQ=")
-    private val appVersion = "11.5"
-    private val appVersionCode = "129"
+    //    private val appVersion = "11.5"
+//    private val appVersionCode = "129"
+    private val appVersion = "19.1"
+    private val appVersionCode = "206"
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val hideNsfw = if (settingsForProvider.enableAdult) 0 else 1
@@ -323,7 +328,7 @@ open class Superstream : MainAPI() {
                 if (postList.isEmpty()) return@mapNotNull null
                 HomePageList(name, postList)
             }
-        return HomePageResponse(pages, hasNext = !pages.any { it.list.isEmpty() })
+        return newHomePageResponse(pages)
     }
 
     private data class Data(
@@ -355,20 +360,16 @@ open class Superstream : MainAPI() {
         }
     }
 
-    private data class MainDataList(
-        @JsonProperty("list") val list: ArrayList<Data> = arrayListOf()
-    )
-
     private data class MainData(
-        @JsonProperty("data") val data: MainDataList
+        @JsonProperty("data") val data: ArrayList<Data> = arrayListOf()
     )
 
     override suspend fun search(query: String): List<SearchResponse> {
         val hideNsfw = if (settingsForProvider.enableAdult) 0 else 1
         val apiQuery =
             // Originally 8 pagelimit
-            """{"childmode":"$hideNsfw","app_version":"$appVersion","appid":"$appIdSecond","module":"Search4","channel":"Website","page":"1","lang":"en","type":"all","keyword":"$query","pagelimit":"20","expired_date":"${getExpiryDate()}","platform":"android"}"""
-        val searchResponse = queryApiParsed<MainData>(apiQuery, true).data.list.mapNotNull {
+            """{"childmode":"$hideNsfw","app_version":"$appVersion","appid":"$appIdSecond","module":"Search5","channel":"Website","page":"1","lang":"en","type":"all","keyword":"$query","pagelimit":"20","expired_date":"${getExpiryDate()}","platform":"android"}"""
+        val searchResponse = queryApiParsed<MainData>(apiQuery, true).data.mapNotNull {
             it.toSearchResponse(this)
         }
         return searchResponse
@@ -578,14 +579,14 @@ open class Superstream : MainAPI() {
             }
         } else { // 2 Series
             val apiQuery =
-                """{"childmode":"$hideNsfw","uid":"","app_version":"$appVersion","appid":"$appIdSecond","module":"TV_detail_1","display_all":"1","channel":"Website","lang":"en","expired_date":"${getExpiryDate()}","platform":"android","tid":"${loadData.id}"}"""
+                """{"childmode":"$hideNsfw","uid":"","app_version":"$appVersion","appid":"$appIdSecond","module":"TV_detail_v2","display_all":"1","channel":"Website","lang":"en","expired_date":"${getExpiryDate()}","platform":"android","tid":"${loadData.id}"}"""
             val data = (queryApiParsed<SeriesDataProp>(apiQuery)).data
                 ?: throw RuntimeException("API error")
 
             val episodes = data.season.mapNotNull {
                 val seasonQuery =
-                    """{"childmode":"$hideNsfw","app_version":"$appVersion","year":"0","appid":"$appIdSecond","module":"TV_episode","display_all":"1","channel":"Website","season":"$it","lang":"en","expired_date":"${getExpiryDate()}","platform":"android","tid":"${loadData.id}"}"""
-                (queryApiParsed<SeriesSeasonProp>(seasonQuery)).data
+                    """{"childmode":"$hideNsfw","uid":"","year":"0","app_version":"$appVersion","appid":"$appIdSecond","module":"TV_episode","display_all":"1","season":"$it","channel":"Website","lang":"en","expired_date":"${getExpiryDate()}","platform":"android","tid":"${loadData.id}"}"""
+                (queryApiParsed<SeriesSeasonProp>(seasonQuery, false)).data
             }.flatten()
 
             return newTvSeriesLoadResponse(
@@ -607,7 +608,7 @@ open class Superstream : MainAPI() {
                         season = it.season
                         episode = it.episode
                         posterUrl = it.thumbs ?: it.thumbsBak ?: it.thumbsMin ?: it.thumbsOriginal
-                        ?: it.thumbsOrg
+                                ?: it.thumbsOrg
                         rating = it.imdbRating?.toDoubleOrNull()?.times(10)?.roundToInt()
                         description = it.synopsis
                         date = it.releasedTimestamp
@@ -711,15 +712,7 @@ open class Superstream : MainAPI() {
 
         val parsed = parseJson<LinkData>(data)
 
-        argamap(
-            {
-                invokeVidsrcto(
-                    parsed.imdbId,
-                    parsed.season,
-                    parsed.episode,
-                    subtitleCallback
-                )
-            },
+        runAllAsync(
             {
                 invokeExternalSource(
                     parsed.mediaId,
@@ -730,17 +723,7 @@ open class Superstream : MainAPI() {
                 )
             },
             {
-                invokeInternalSource(
-                    parsed.id,
-                    parsed.type,
-                    parsed.season,
-                    parsed.episode,
-                    subtitleCallback,
-                    callback
-                )
-            },
-            {
-                invokeOpenSubs(
+                invokeWyzie(
                     parsed.imdbId,
                     parsed.season,
                     parsed.episode,
@@ -764,7 +747,7 @@ open class Superstream : MainAPI() {
         @JsonProperty("data") val data: Data? = null,
     ) {
         data class Data(
-            @JsonProperty("link") val link: String? = null,
+            @JsonProperty("share_link") val link: String? = null,
             @JsonProperty("file_list") val file_list: ArrayList<FileList>? = arrayListOf(),
         ) {
             data class FileList(
@@ -806,18 +789,9 @@ open class Superstream : MainAPI() {
         @JsonProperty("subtitles") val subtitles: ArrayList<WatchsomuchSubtitles>? = arrayListOf(),
     )
 
-    data class OsSubtitles(
+    data class WyzieSubtitle(
+        @JsonProperty("display") val display: String? = null,
         @JsonProperty("url") val url: String? = null,
-        @JsonProperty("lang") val lang: String? = null,
-    )
-
-    data class OsResult(
-        @JsonProperty("subtitles") val subtitles: ArrayList<OsSubtitles>? = arrayListOf(),
-    )
-
-    data class VidsrcSubtitles(
-        @JsonProperty("label") val label: String? = null,
-        @JsonProperty("file") val file: String? = null,
     )
 
 }
