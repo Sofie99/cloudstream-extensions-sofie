@@ -1,5 +1,5 @@
 // use an integer for version numbers
-version = 237
+version = 238
 
 cloudstream {
     language = "en"

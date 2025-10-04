@@ -232,9 +232,9 @@ object SoraExtractor : SoraStream() {
     ) {
 
         val url = if (season == null) {
-            "$vidsrcccAPI/v2/embed/movie/$tmdbId"
+            "$vidsrcccAPI/v3/embed/movie/$tmdbId"
         } else {
-            "$vidsrcccAPI/v2/embed/tv/$tmdbId/$season/$episode"
+            "$vidsrcccAPI/v3/embed/tv/$tmdbId/$season/$episode"
         }
 
         val script =
