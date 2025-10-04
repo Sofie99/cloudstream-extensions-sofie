@@ -583,7 +583,7 @@ object SoraExtractor : SoraStream() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit,
     ) {
-        val module = "hezushon/dat/eru/1000043515190376/APA9124osCc5ABZPtM3gXRBH4-xaSlOvQcWSza9mB0Pb6XSyzMaSC7_mYG_GlI2XWJfmPqYwv2g7h_y7ok0s7u5Xrza8rPY60FnSbG6ehqx2xeW2-L63_yKYx-3-CeaM7HtsvFQLWX7iSb7DHoTAU6oOIvJHiTnKXBaXzNDrCrP2LL4mcyfep-E/v/2009f9db"
+        val module = "hezushon/2c964f21932564b02aaf366bc1a844dc73e814348d8f6f05cc216b37652fc5d3/7bcfcea8caa45461ee91892a0aed6a96bc2101dc/APA91HuGAcQlY-iohZ0rAUokwzf42gbtRpoIS5Ji__h71jJQIlwvP6BlFOz3SmJ0T611CKuPvwwJ_B54hu1XWaVAw7ONAsELuN3DosskJnVbQ_eHmzSz4VN78GSTxrg6Er3sMUJ4AFhbJ-AM0XMCDXuWtthY1fck_e74tEC9L4bB3keeCM5YfI4/d5dff39f/05734c48-c213-55a4-9d8b-e846e35a5ac3/p"
         val type = if (season == null) "movie" else "tv"
         val url = if (season == null) {
             "$vidfastAPI/$type/$tmdbId"
@@ -593,14 +593,14 @@ object SoraExtractor : SoraStream() {
 
         val res = app.get(
             url, interceptor = WebViewResolver(
-                Regex("""$vidfastAPI/$module/lF915CiyYQ"""),
+                Regex("""$vidfastAPI/$module/Vsx1eT_KgZ-C"""),
                 timeout = 15_000L
             )
         ).text
 
         tryParseJson<ArrayList<VidFastServers>>(res)?.filter { it.description?.contains("Original audio") == true }
             ?.amapIndexed { index, server ->
-                val source = app.get("$vidfastAPI/$module/3wfYhX0Xg3Q/${server.data}" , headers = mapOf(
+                val source = app.get("$vidfastAPI/$module/tQMg/${server.data}" , headers = mapOf(
                     "X-Requested-With" to "XMLHttpRequest",
                     "X-Csrf-Token" to "bkeehPvFyhFlit6PZScS13NveIptUEGA"
                 ), referer = "$vidfastAPI/").parsedSafe<VidFastSources>()
