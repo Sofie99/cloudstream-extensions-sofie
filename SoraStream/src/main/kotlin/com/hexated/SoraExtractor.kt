@@ -600,10 +600,7 @@ object SoraExtractor : SoraStream() {
 
         tryParseJson<ArrayList<VidFastServers>>(res)?.filter { it.description?.contains("Original audio") == true }
             ?.amapIndexed { index, server ->
-                val source = app.get("$vidfastAPI/$module/tQMg/${server.data}" , headers = mapOf(
-                    "X-Requested-With" to "XMLHttpRequest",
-                    "X-Csrf-Token" to "bkeehPvFyhFlit6PZScS13NveIptUEGA"
-                ), referer = "$vidfastAPI/").parsedSafe<VidFastSources>()
+                val source = app.get("$vidfastAPI/$module/tQMg/${server.data}", referer = "$vidfastAPI/").parsedSafe<VidFastSources>()
 
                 callback.invoke(
                     newExtractorLink(
