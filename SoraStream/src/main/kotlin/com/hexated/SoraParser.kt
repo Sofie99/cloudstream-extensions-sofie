@@ -17,6 +17,10 @@ data class VixsrcSource(
     val referer: String,
 )
 
+data class VidsrccxSource(
+    @JsonProperty("secureUrl") val secureUrl: String? = null,
+)
+
 data class WyzieSubtitle(
     @JsonProperty("display") val display: String? = null,
     @JsonProperty("url") val url: String? = null,

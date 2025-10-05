@@ -8,6 +8,7 @@ import com.hexated.SoraExtractor.invokeVidfast
 import com.hexated.SoraExtractor.invokeVidlink
 import com.hexated.SoraExtractor.invokeVidsrc
 import com.hexated.SoraExtractor.invokeVidsrccc
+import com.hexated.SoraExtractor.invokeVidsrccx
 import com.hexated.SoraExtractor.invokeVixsrc
 import com.hexated.SoraExtractor.invokeWatchsomuch
 import com.hexated.SoraExtractor.invokeWyzie
@@ -60,6 +61,7 @@ open class SoraStream : TmdbProvider() {
         const val vidfastAPI = "https://vidfast.pro"
         const val wyzieAPI = "https://sub.wyzie.ru"
         const val vixsrcAPI = "https://vixsrc.to"
+        const val vidsrccxAPI = "https://vidsrc.cx"
 
         fun getType(t: String?): TvType {
             return when (t) {
@@ -340,6 +342,9 @@ open class SoraStream : TmdbProvider() {
             },
             {
                 invokeWyzie(res.id, res.season, res.episode, subtitleCallback)
+            },
+            {
+                invokeVidsrccx(res.id, res.season, res.episode, callback)
             }
         )
 

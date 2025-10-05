@@ -6,6 +6,7 @@ import com.lagradost.cloudstream3.APIHolder.unixTimeMS
 import com.lagradost.cloudstream3.extractors.helper.AesHelper
 import com.lagradost.cloudstream3.network.WebViewResolver
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import com.lagradost.nicehttp.RequestBodyTypes
 import com.lagradost.nicehttp.Requests
@@ -693,6 +694,33 @@ object SoraExtractor : SoraStream() {
                 }
             )
         }
+
+    }
+
+    suspend fun invokeVidsrccx(
+        tmdbId: Int?,
+        season: Int?,
+        episode: Int?,
+        callback: (ExtractorLink) -> Unit,
+    ) {
+        val filePath = if(season == null) "/media/$tmdbId/master.m3u8" else "/media/$tmdbId-$season-$episode/master.m3u8"
+        val video = app.post("https://8ball.piracy.cloud/api/generate-secure-url", requestBody = mapOf(
+            "filePath" to filePath
+        ).toJson().toRequestBody(RequestBodyTypes.JSON.toMediaTypeOrNull())).parsedSafe<VidsrccxSource>()?.secureUrl
+
+        callback.invoke(
+            newExtractorLink(
+                "VidsrcCx",
+                "VidsrcCx",
+                video ?: return,
+                ExtractorLinkType.M3U8
+            ) {
+                this.referer = "$vidsrccxAPI/"
+                this.headers = mapOf(
+                    "Accept" to "*/*"
+                )
+            }
+        )
 
     }
 
