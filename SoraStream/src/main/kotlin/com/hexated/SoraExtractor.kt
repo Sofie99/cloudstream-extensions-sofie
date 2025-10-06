@@ -233,9 +233,9 @@ object SoraExtractor : SoraStream() {
     ) {
 
         val url = if (season == null) {
-            "$vidsrcccAPI/v3/embed/movie/$tmdbId"
+            "$vidsrcccAPI/v2/embed/movie/$tmdbId"
         } else {
-            "$vidsrcccAPI/v3/embed/tv/$tmdbId/$season/$episode"
+            "$vidsrcccAPI/v2/embed/tv/$tmdbId/$season/$episode"
         }
 
         val script =
@@ -244,7 +244,7 @@ object SoraExtractor : SoraStream() {
         val userId = script.substringAfter("userId = \"").substringBefore("\";")
         val v = script.substringAfter("v = \"").substringBefore("\";")
 
-        val vrf = generateVrf("$tmdbId", userId)
+        val vrf = VidsrcHelper.encryptAesCbc("$tmdbId", userId)
 
         val serverUrl = if (season == null) {
             "$vidsrcccAPI/api/$tmdbId/servers?id=$tmdbId&type=movie&v=$v&vrf=$vrf&imdbId=$imdbId"

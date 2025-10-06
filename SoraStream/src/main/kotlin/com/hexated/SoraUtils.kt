@@ -12,9 +12,11 @@ import com.lagradost.nicehttp.RequestBodyTypes
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.net.*
+import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 var gomoviesCookies: Map<String, String>? = null
@@ -430,33 +432,27 @@ private enum class Symbol(val decimalValue: Int) {
     }
 }
 
-fun generateVrf(movieId: String, userId: String): String {
-    val state = IntArray(256) { it }
-    var j = 0
-
-    // Key scheduling algorithm
-    for (i in 0 until 256) {
-        j = ((j + state[i] + userId.getOrNull(i % userId.length)?.code!!) ?: 0) % 256
-        state[i] = state[j].also { state[j] = state[i] }
+object VidsrcHelper {
+    private fun base64UrlEncode(input: ByteArray): String {
+        return base64Encode(input)
+            .replace("+", "-")
+            .replace("/", "_")
+            .replace("=", "")
     }
 
-    // Generate keystream and encrypt
-    var i = 0
-    j = 0
-    val result = StringBuilder()
+    fun encryptAesCbc(plainText: String, keyText: String): String {
+        val sha256 = MessageDigest.getInstance("SHA-256")
+        val keyBytes = sha256.digest(keyText.toByteArray(Charsets.UTF_8))
+        val secretKey = SecretKeySpec(keyBytes, "AES")
 
-    for (char in movieId) {
-        i = (i + 1) % 256
-        j = (j + state[i]) % 256
-        state[i] = state[j].also { state[j] = state[i] }
+        val iv = ByteArray(16) { 0 }
+        val ivSpec = IvParameterSpec(iv)
 
-        val keystreamByte = state[(state[i] + state[j]) % 256]
-        result.append((char.code xor keystreamByte).toChar())
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec)
+
+        val encrypted = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
+        return base64UrlEncode(encrypted)
     }
 
-    val str = result.toString()
-    return base64Encode(str.toByteArray(Charsets.ISO_8859_1))
-        .replace("+", "-")
-        .replace("/", "_")
-        .replace(Regex("=+$"), "")
 }
