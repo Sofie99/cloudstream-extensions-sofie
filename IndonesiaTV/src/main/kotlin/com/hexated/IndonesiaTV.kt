@@ -7,21 +7,17 @@ import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
+import com.lagradost.cloudstream3.utils.INFER_TYPE
 import com.lagradost.cloudstream3.utils.newExtractorLink
-
 
 class IndonesiaTV : MainAPI() {
     override var mainUrl = "https://raw.githubusercontent.com/Sofie99/Resources/refs/heads/main/iptv.json"
     override var name = "IndonesiaTV"
-    override var lang = "id"
     override val hasDownloadSupport = false
+    override var lang = "id"
     override val hasMainPage = true
     override val supportedTypes = setOf(
         TvType.Live
-    )
-
-    override val mainPage = mainPageOf(
-        "Channels" to mainUrl,
     )
 
     override suspend fun getMainPage(
@@ -40,7 +36,7 @@ class IndonesiaTV : MainAPI() {
             }
         } ?: throw ErrorLoadingException()
 
-        return newHomePageResponse(HomePageList(request.name, home, true), false)
+        return newHomePageResponse(HomePageList("Channels", home, true), false)
     }
 
     override suspend fun load(url: String): LoadResponse {
@@ -62,7 +58,7 @@ class IndonesiaTV : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
 
-        val json = parseJson<Channels>(data)
+        val json = tryParseJson<Channels>(data) ?: return false
         when {
             json.group.equals("rctiplus") -> {
                 invokeRctiPlus(
@@ -115,20 +111,21 @@ class IndonesiaTV : MainAPI() {
     ) {
         val video = app.get(
             url, headers = mapOf(
-                "X-Api-Key" to "CH1ZFsN4N/MIfAds1DL9mP151CNqIpWHqZGRr+LkvUyiq3FRPuP1Kt6aK+pG3nEC1FXt0ZAAJ5FKP8QU8CZ5/vOCo++GInT1QwtQAeXAHFIp5jyVmvRHXJg9ULThAvmCEHA/pd1hJT1aTwWZhf6YEEBEQw5qL4ozjWr2m9pdPSE=",
-                "X-Signature" to "4c171ae6f4feb5c98d11ec9ca0ea67970bb15cb6a894510ce4bb2ef48f6f4c96",
+                "luws" to "A52B1EB2-77FB-3F23-E3C2-BEBF96561D37_",
+                "X-Api-Key" to "CH1ZFsN4N/MIfAds1DL9mP151CNqIpWHqZGRr+LkvUyiq3FRPuP1Kt6aK+pG3nEC1FXt0ZAAJ5FKP8QU8CZ5/ipr7SJ89+P6HUs17OjYVqS6EGrQ/R/H/l7H/ygFv1i1uSy6XtDwy2y4TiSmieQlluj101GzymMK3gl8ixibBmE=",
+                "X-Signature" to "fd7bd6c246bd70213277d653ac8b455f271fb92b6ada87659bcb633b44019e5d",
                 "X-API-Platform" to "web-desktop",
-                "X-Client" to "1758467532.263",
+                "X-Client" to "1759754031.876",
                 "X-Secure-Level" to "2",
             )
-        ).parsedSafe<VideoComSource>()?.data?.attributes?.hls
+        ).parsedSafe<VideoComSource>()?.data?.attributes
 
         callback.invoke(
             newExtractorLink(
                 channel,
                 channel,
-                video ?: return,
-                ExtractorLinkType.M3U8
+                video?.dash ?: video?.hls ?: return,
+                INFER_TYPE
             ) {
                 this.referer = "https://www.vidio.com/"
             }
@@ -189,6 +186,7 @@ class IndonesiaTV : MainAPI() {
         ) {
             data class Attributes(
                 @JsonProperty("hls") val hls: String? = null,
+                @JsonProperty("dash") val dash: String? = null,
             )
         }
     }
