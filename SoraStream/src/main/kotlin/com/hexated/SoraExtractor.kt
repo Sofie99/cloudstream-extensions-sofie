@@ -511,7 +511,7 @@ object SoraExtractor : SoraStream() {
         }
 
         val headers = mapOf(
-            "Next-Action" to "40b6aee60efbf1ae586fc60e3bf69babebf2ceae2c",
+            "Next-Action" to "403f7ef15810cd565978d2ac5b7815bb0ff20258a5",
         )
 
         val res = app.post(
@@ -691,8 +691,8 @@ object SoraExtractor : SoraStream() {
             "$proxy/p/${base64Encode("$proxy/api/proxy/m3u8?url=${encode(video1)}&source=sakura|ananananananananaBatman!".toByteArray())}"
 
         listOf(
-            VixsrcSource("Vixsrc", video1, url),
-            VixsrcSource("Mapple", video2, "$mappleAPI/"),
+            VixsrcSource("Vixsrc [Alpha]",video1,url),
+            VixsrcSource("Vixsrc [Beta]",video2, "$mappleAPI/"),
         ).map {
             callback.invoke(
                 newExtractorLink(

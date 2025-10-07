@@ -343,6 +343,9 @@ open class SoraStream : TmdbProvider() {
                 invokeVidfast(res.id, res.season, res.episode, subtitleCallback, callback)
             },
             {
+                invokeMapple(res.id, res.season, res.episode, subtitleCallback, callback)
+            },
+            {
                 invokeWyzie(res.id, res.season, res.episode, subtitleCallback)
             },
             {
