@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.hexated.SoraExtractor.invokeGomovies
 import com.hexated.SoraExtractor.invokeIdlix
 import com.hexated.SoraExtractor.invokeMapple
+import com.hexated.SoraExtractor.invokeSuperembed
 import com.hexated.SoraExtractor.invokeVidfast
 import com.hexated.SoraExtractor.invokeVidlink
 import com.hexated.SoraExtractor.invokeVidsrc
@@ -62,6 +63,7 @@ open class SoraStream : TmdbProvider() {
         const val wyzieAPI = "https://sub.wyzie.ru"
         const val vixsrcAPI = "https://vixsrc.to"
         const val vidsrccxAPI = "https://vidsrc.cx"
+        const val superembedAPI = "https://multiembed.mov"
 
         fun getType(t: String?): TvType {
             return when (t) {
@@ -345,6 +347,15 @@ open class SoraStream : TmdbProvider() {
             },
             {
                 invokeVidsrccx(res.id, res.season, res.episode, callback)
+            },
+            {
+                invokeSuperembed(
+                    res.id,
+                    res.season,
+                    res.episode,
+                    subtitleCallback,
+                    callback
+                )
             }
         )
 

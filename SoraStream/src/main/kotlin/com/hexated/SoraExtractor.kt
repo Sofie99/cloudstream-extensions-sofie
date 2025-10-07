@@ -65,7 +65,8 @@ object SoraExtractor : SoraStream() {
         )
 
         var res = app.get("$api/search/$query", cookies = cookies)
-        cookies = gomoviesCookies ?: res.cookies.filter { it.key == "advanced-frontendgomovies7" }.also { gomoviesCookies = it }
+        cookies = gomoviesCookies ?: res.cookies.filter { it.key == "advanced-frontendgomovies7" }
+            .also { gomoviesCookies = it }
         val doc = res.document
         val media = doc.select("div.$mediaSelector").map {
             Triple(it.attr("data-filmName"), it.attr("data-year"), it.select("a").attr("href"))
@@ -212,9 +213,11 @@ object SoraExtractor : SoraStream() {
                 source.startsWith("https://jeniusplay.com") -> {
                     Jeniusplay2().getUrl(source, "$referer/", subtitleCallback, callback)
                 }
+
                 !source.contains("youtube") -> {
                     loadExtractor(source, "$referer/", subtitleCallback, callback)
                 }
+
                 else -> {
                     return@amap
                 }
@@ -478,7 +481,8 @@ object SoraExtractor : SoraStream() {
         app.get(subUrl).parsedSafe<WatchsomuchSubResponses>()?.subtitles?.map { sub ->
             subtitleCallback.invoke(
                 SubtitleFile(
-                    sub.label?.substringBefore("&nbsp")?.trim() ?: "", fixUrl(sub.url ?: return@map null, watchSomuchAPI)
+                    sub.label?.substringBefore("&nbsp")?.trim() ?: "",
+                    fixUrl(sub.url ?: return@map null, watchSomuchAPI)
                 )
             )
         }
@@ -553,15 +557,17 @@ object SoraExtractor : SoraStream() {
         episode: Int?,
         callback: (ExtractorLink) -> Unit,
     ) {
-        val type = if(season == null) "movie" else "tv"
-        val url = if(season == null) {
+        val type = if (season == null) "movie" else "tv"
+        val url = if (season == null) {
             "$vidlinkAPI/$type/$tmdbId"
         } else {
             "$vidlinkAPI/$type/$tmdbId/$season/$episode"
         }
 
-        val videoLink = app.get(url, interceptor = WebViewResolver(
-            Regex("""$vidlinkAPI/api/b/$type/A{32}"""), timeout = 15_000L)
+        val videoLink = app.get(
+            url, interceptor = WebViewResolver(
+                Regex("""$vidlinkAPI/api/b/$type/A{32}"""), timeout = 15_000L
+            )
         ).parsedSafe<VidlinkSources>()?.stream?.playlist
 
         callback.invoke(
@@ -584,7 +590,8 @@ object SoraExtractor : SoraStream() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit,
     ) {
-        val module = "hezushon/2c964f21932564b02aaf366bc1a844dc73e814348d8f6f05cc216b37652fc5d3/7bcfcea8caa45461ee91892a0aed6a96bc2101dc/APA91HuGAcQlY-iohZ0rAUokwzf42gbtRpoIS5Ji__h71jJQIlwvP6BlFOz3SmJ0T611CKuPvwwJ_B54hu1XWaVAw7ONAsELuN3DosskJnVbQ_eHmzSz4VN78GSTxrg6Er3sMUJ4AFhbJ-AM0XMCDXuWtthY1fck_e74tEC9L4bB3keeCM5YfI4/d5dff39f/05734c48-c213-55a4-9d8b-e846e35a5ac3/p"
+        val module =
+            "hezushon/2c964f21932564b02aaf366bc1a844dc73e814348d8f6f05cc216b37652fc5d3/7bcfcea8caa45461ee91892a0aed6a96bc2101dc/APA91HuGAcQlY-iohZ0rAUokwzf42gbtRpoIS5Ji__h71jJQIlwvP6BlFOz3SmJ0T611CKuPvwwJ_B54hu1XWaVAw7ONAsELuN3DosskJnVbQ_eHmzSz4VN78GSTxrg6Er3sMUJ4AFhbJ-AM0XMCDXuWtthY1fck_e74tEC9L4bB3keeCM5YfI4/d5dff39f/05734c48-c213-55a4-9d8b-e846e35a5ac3/p"
         val type = if (season == null) "movie" else "tv"
         val url = if (season == null) {
             "$vidfastAPI/$type/$tmdbId"
@@ -601,7 +608,9 @@ object SoraExtractor : SoraStream() {
 
         tryParseJson<ArrayList<VidFastServers>>(res)?.filter { it.description?.contains("Original audio") == true }
             ?.amapIndexed { index, server ->
-                val source = app.get("$vidfastAPI/$module/tQMg/${server.data}", referer = "$vidfastAPI/").parsedSafe<VidFastSources>()
+                val source =
+                    app.get("$vidfastAPI/$module/tQMg/${server.data}", referer = "$vidfastAPI/")
+                        .parsedSafe<VidFastSources>()
 
                 callback.invoke(
                     newExtractorLink(
@@ -612,7 +621,7 @@ object SoraExtractor : SoraStream() {
                     )
                 )
 
-                if(index == 1) {
+                if (index == 1) {
                     source.tracks?.map { subtitle ->
                         subtitleCallback.invoke(
                             SubtitleFile(
@@ -634,7 +643,7 @@ object SoraExtractor : SoraStream() {
         episode: Int?,
         subtitleCallback: (SubtitleFile) -> Unit,
     ) {
-        val url = if(season == null) {
+        val url = if (season == null) {
             "$wyzieAPI/search?id=$tmdbId"
         } else {
             "$wyzieAPI/search?id=$tmdbId&season=$season&episode=$episode"
@@ -667,18 +676,23 @@ object SoraExtractor : SoraStream() {
             "$vixsrcAPI/$type/$tmdbId/$season/$episode"
         }
 
-        val res = app.get(url).document.selectFirst("script:containsData(window.masterPlaylist)")?.data() ?: return
+        val res =
+            app.get(url).document.selectFirst("script:containsData(window.masterPlaylist)")?.data()
+                ?: return
 
-        val video1 = Regex("""'token':\s*'(\w+)'[\S\s]+'expires':\s*'(\w+)'[\S\s]+url:\s*'(\S+)'""").find(res)?.let {
-            val (token, expires, path) = it.destructured
-            "$path?token=$token&expires=$expires&h=1&lang=en"
-        } ?: return
+        val video1 =
+            Regex("""'token':\s*'(\w+)'[\S\s]+'expires':\s*'(\w+)'[\S\s]+url:\s*'(\S+)'""").find(res)
+                ?.let {
+                    val (token, expires, path) = it.destructured
+                    "$path?token=$token&expires=$expires&h=1&lang=en"
+                } ?: return
 
-        val video2 = "$proxy/p/${base64Encode("$proxy/api/proxy/m3u8?url=${encode(video1)}&source=sakura|ananananananananaBatman!".toByteArray())}"
+        val video2 =
+            "$proxy/p/${base64Encode("$proxy/api/proxy/m3u8?url=${encode(video1)}&source=sakura|ananananananananaBatman!".toByteArray())}"
 
         listOf(
-            VixsrcSource("Vixsrc",video1,url),
-            VixsrcSource("Mapple",video2, "$mappleAPI/"),
+            VixsrcSource("Vixsrc", video1, url),
+            VixsrcSource("Mapple", video2, "$mappleAPI/"),
         ).map {
             callback.invoke(
                 newExtractorLink(
@@ -703,10 +717,13 @@ object SoraExtractor : SoraStream() {
         episode: Int?,
         callback: (ExtractorLink) -> Unit,
     ) {
-        val filePath = if(season == null) "/media/$tmdbId/master.m3u8" else "/media/$tmdbId-$season-$episode/master.m3u8"
-        val video = app.post("https://8ball.piracy.cloud/api/generate-secure-url", requestBody = mapOf(
-            "filePath" to filePath
-        ).toJson().toRequestBody(RequestBodyTypes.JSON.toMediaTypeOrNull())).parsedSafe<VidsrccxSource>()?.secureUrl
+        val filePath =
+            if (season == null) "/media/$tmdbId/master.m3u8" else "/media/$tmdbId-$season-$episode/master.m3u8"
+        val video = app.post(
+            "https://8ball.piracy.cloud/api/generate-secure-url", requestBody = mapOf(
+                "filePath" to filePath
+            ).toJson().toRequestBody(RequestBodyTypes.JSON.toMediaTypeOrNull())
+        ).parsedSafe<VidsrccxSource>()?.secureUrl
 
         callback.invoke(
             newExtractorLink(
@@ -721,6 +738,61 @@ object SoraExtractor : SoraStream() {
                 )
             }
         )
+
+    }
+
+    suspend fun invokeSuperembed(
+        tmdbId: Int?,
+        season: Int?,
+        episode: Int?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit,
+        api: String = "https://streamingnow.mov"
+    ) {
+        val path = if (season == null) "" else "&s=$season&e=$episode"
+        val token = app.get("$superembedAPI/directstream.php?video_id=$tmdbId&tmdb=1$path").url.substringAfter(
+                "?play="
+            )
+
+        val (server, id) = app.post(
+            "$api/response.php", data = mapOf(
+                "token" to token
+            ), headers = mapOf("X-Requested-With" to "XMLHttpRequest")
+        ).document.select("ul.sources-list li:contains(vipstream-S)")
+            .let { it.attr("data-server") to it.attr("data-id") }
+
+        val iframe =
+            app.get("$api/playvideo.php?video_id=$id&server_id=$server&token=$token&init=1").document.select(
+                "iframe.source-frame"
+            ).attr("src")
+        val json = app.get(iframe).text.substringAfter("Playerjs(").substringBefore(");")
+
+        val video = """file:"([^"]+)""".toRegex().find(json)?.groupValues?.get(1)
+
+        callback.invoke(
+            newExtractorLink(
+                "Superembed",
+                "Superembed",
+                video ?: return,
+                INFER_TYPE
+            ) {
+                this.headers = mapOf(
+                    "Accept" to "*/*"
+                )
+            }
+        )
+
+        """subtitle:"([^"]+)""".toRegex().find(json)?.groupValues?.get(1)?.split(",")?.map {
+            val (subLang, subUrl) = Regex("""\[(\w+)](http\S+)""").find(it)?.destructured
+                ?: return@map
+            subtitleCallback.invoke(
+                SubtitleFile(
+                    subLang.trim(),
+                    subUrl.trim()
+                )
+            )
+        }
+
 
     }
 
