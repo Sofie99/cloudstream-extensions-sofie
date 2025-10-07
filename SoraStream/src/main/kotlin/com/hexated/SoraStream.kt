@@ -132,6 +132,7 @@ open class SoraStream : TmdbProvider() {
             TvType.Movie,
         ) {
             this.posterUrl = getImageUrl(posterPath)
+            this.score= Score.from10(voteAverage)
         }
     }
 
@@ -407,6 +408,7 @@ open class SoraStream : TmdbProvider() {
         @JsonProperty("original_title") val originalTitle: String? = null,
         @JsonProperty("media_type") val mediaType: String? = null,
         @JsonProperty("poster_path") val posterPath: String? = null,
+        @JsonProperty("vote_average") val voteAverage: Double? = null,
     )
 
     data class Genres(
