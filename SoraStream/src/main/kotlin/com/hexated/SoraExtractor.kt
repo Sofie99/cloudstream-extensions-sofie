@@ -761,11 +761,14 @@ object SoraExtractor : SoraStream() {
         ).document.select("ul.sources-list li:contains(vipstream-S)")
             .let { it.attr("data-server") to it.attr("data-id") }
 
-        val iframe =
-            app.get("$api/playvideo.php?video_id=$id&server_id=$server&token=$token&init=1").document.select(
-                "iframe.source-frame"
-            ).attr("src")
-        val json = app.get(iframe).text.substringAfter("Playerjs(").substringBefore(");")
+        val playUrl = "$api/playvideo.php?video_id=$id&server_id=$server&token=$token&init=1"
+        val playRes = app.get(playUrl).document
+        val iframe = playRes.selectFirst("iframe.source-frame")?.attr("src") ?: run {
+            val captchaId = playRes.select("input[name=captcha_id]").attr("value")
+            app.post(playUrl, requestBody = "captcha_id=TEduRVR6NmZ3Sk5Jc3JpZEJCSlhTM25GREs2RCswK0VQN2ZsclI5KzNKL2cyV3dIaFEwZzNRRHVwMzdqVmoxV0t2QlBrNjNTY04wY2NSaHlWYS9Jc09nb25wZTV2YmxDSXNRZVNuQUpuRW5nbkF2dURsQUdJWVpwOWxUZzU5Tnh0NXllQjdYUG83Y0ZVaG1XRGtPOTBudnZvN0RFK0wxdGZvYXpFKzVNM2U1a2lBMG40REJmQ042SA%3D%3D&captcha_answer%5B%5D=8yhbjraxqf3o&captcha_answer%5B%5D=10zxn5vi746w&captcha_answer%5B%5D=gxfpe17tdwub".toRequestBody(RequestBodyTypes.TEXT.toMediaTypeOrNull())
+            ).document.selectFirst("iframe.source-frame")?.attr("src")
+        }
+        val json = app.get(iframe ?: return).text.substringAfter("Playerjs(").substringBefore(");")
 
         val video = """file:"([^"]+)""".toRegex().find(json)?.groupValues?.get(1)
 
