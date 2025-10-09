@@ -213,7 +213,7 @@ object Extractors : Superstream() {
         tryParseJson<ArrayList<VdrkSubtitle>>(res)?.map { subtitle ->
             subtitleCallback.invoke(
                 SubtitleFile(
-                    subtitle.label ?: return@map,
+                    subtitle.label?.replace(Regex("Hi\\d+"), "")?.replace(Regex("\\d+"), "")?.trim() ?: return@map,
                     subtitle.file ?: return@map,
                 )
             )
