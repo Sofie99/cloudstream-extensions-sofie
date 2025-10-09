@@ -196,6 +196,31 @@ object Extractors : Superstream() {
 
     }
 
+    suspend fun invokeVdrk(
+        tmdbId: Int?,
+        season: Int?,
+        episode: Int?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+    ) {
+        val url = if (season == null) {
+            "$vdrkAPI/movie/$tmdbId"
+        } else {
+            "$vdrkAPI/tv/$tmdbId/$season/$episode"
+        }
+
+        val res = app.get(url).text
+
+        tryParseJson<ArrayList<VdrkSubtitle>>(res)?.map { subtitle ->
+            subtitleCallback.invoke(
+                SubtitleFile(
+                    subtitle.label ?: return@map,
+                    subtitle.file ?: return@map,
+                )
+            )
+        }
+
+    }
+
     private fun fixUrl(url: String, domain: String): String {
         if (url.startsWith("http")) {
             return url

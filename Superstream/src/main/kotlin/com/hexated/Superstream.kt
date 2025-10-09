@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.hexated.Extractors.base64DefaultDecode
 import com.hexated.Extractors.base64DefaultEncode
 import com.hexated.Extractors.invokeExternalSource
+import com.hexated.Extractors.invokeVdrk
 import com.hexated.Extractors.invokeWatchsomuch
 import com.hexated.Extractors.invokeWyzie
 import com.hexated.Superstream.CipherUtils.getVerify
@@ -292,6 +293,10 @@ open class Superstream : MainAPI() {
 
     val watchSomuchAPI = "https://watchsomuch.tv"
     val wyzieAPI = "https://sub.wyzie.ru"
+    val vdrkAPI = "https://sub.vdrk.site"
+    val tmdbAPI = "https://api.themoviedb.org"
+
+    val tmdbKey = "b030404650f279792a8d3287232358e3"
 
     private val appKey = base64Decode("bW92aWVib3g=")
     val appId = base64Decode("Y29tLnRkby5zaG93Ym94")
@@ -554,6 +559,10 @@ open class Superstream : MainAPI() {
             val data = (queryApiParsed<MovieDataProp>(apiQuery)).data
                 ?: throw RuntimeException("API error")
 
+            val tmdbId =
+                app.get("$tmdbAPI/3/find/${data.imdbId}?api_key=$tmdbKey&external_source=imdb_id")
+                    .parsedSafe<TmdbResults>()?.movie_results?.first()?.id
+
             return newMovieLoadResponse(
                 data.title ?: "",
                 url,
@@ -564,7 +573,8 @@ open class Superstream : MainAPI() {
                     null,
                     null,
                     data.id,
-                    data.imdbId
+                    data.imdbId,
+                    tmdbId
                 ),
             ) {
                 this.recommendations =
@@ -582,6 +592,10 @@ open class Superstream : MainAPI() {
                 """{"childmode":"$hideNsfw","uid":"","app_version":"$appVersion","appid":"$appIdSecond","module":"TV_detail_v2","display_all":"1","channel":"Website","lang":"en","expired_date":"${getExpiryDate()}","platform":"android","tid":"${loadData.id}"}"""
             val data = (queryApiParsed<SeriesDataProp>(apiQuery)).data
                 ?: throw RuntimeException("API error")
+
+            val tmdbId =
+                app.get("$tmdbAPI/3/find/${data.imdbId}?api_key=$tmdbKey&external_source=imdb_id")
+                    .parsedSafe<TmdbResults>()?.tv_results?.first()?.id
 
             val episodes = data.season.mapNotNull {
                 val seasonQuery =
@@ -601,7 +615,8 @@ open class Superstream : MainAPI() {
                             it.season,
                             it.episode,
                             data.id,
-                            data.imdbId
+                            data.imdbId,
+                            tmdbId
                         ).toJson(),
                     ) {
                         name = it.title
@@ -632,7 +647,21 @@ open class Superstream : MainAPI() {
         val episode: Int?,
         val mediaId: Int?,
         val imdbId: String?,
+        val tmdbId: Int? = null,
     )
+
+    data class TmdbResults(
+        @JsonProperty("movie_results") val movie_results: ArrayList<MovieResults>? = arrayListOf(),
+        @JsonProperty("tv_results") val tv_results: ArrayList<TvResults>? = arrayListOf(),
+    ) {
+        data class MovieResults(
+            @JsonProperty("id") val id: Int? = null,
+        )
+
+        data class TvResults(
+            @JsonProperty("id") val id: Int? = null,
+        )
+    }
 
     data class LinkDataProp(
         @JsonProperty("code") val code: Int? = null,
@@ -737,6 +766,14 @@ open class Superstream : MainAPI() {
                     parsed.episode,
                     subtitleCallback
                 )
+            },
+            {
+                invokeVdrk(
+                    parsed.tmdbId,
+                    parsed.season,
+                    parsed.episode,
+                    subtitleCallback
+                )
             }
         )
 
@@ -792,6 +829,11 @@ open class Superstream : MainAPI() {
     data class WyzieSubtitle(
         @JsonProperty("display") val display: String? = null,
         @JsonProperty("url") val url: String? = null,
+    )
+
+    data class VdrkSubtitle(
+        @JsonProperty("label") val label: String? = null,
+        @JsonProperty("file") val file: String? = null,
     )
 
 }
