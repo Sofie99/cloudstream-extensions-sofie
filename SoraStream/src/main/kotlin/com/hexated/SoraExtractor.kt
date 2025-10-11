@@ -799,5 +799,68 @@ object SoraExtractor : SoraStream() {
 
     }
 
+    suspend fun invokeVidrock(
+        tmdbId: Int?,
+        season: Int?,
+        episode: Int?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit,
+        subAPI: String = "https://sub.vdrk.site"
+    ) {
+
+        val type = if (season == null) "movie" else "tv"
+        val url = "$vidrockAPI/$type/$tmdbId${if(type == "movie") "" else "/$season/$episode"}"
+        val encryptData = VidrockHelper.encrypt(tmdbId, type, season, episode)
+
+        app.get("$vidrockAPI/api/$type/$encryptData", referer = url).parsedSafe<LinkedHashMap<String,HashMap<String,String>>>()
+            ?.map { source ->
+                if(source.key == "source2") {
+                    val json = app.get(source.value["url"] ?: return@map, referer = "${vidrockAPI}/").text
+                    tryParseJson<ArrayList<VidrockSource>>(json)?.reversed()?.map mirror@{
+                        callback.invoke(
+                            newExtractorLink(
+                                "Vidrock",
+                                "Vidrock [Source2]",
+                                it.url ?: return@mirror,
+                                INFER_TYPE
+                            ) {
+                                this.quality = it.resolution ?: Qualities.Unknown.value
+                                this.headers = mapOf(
+                                    "Range" to "bytes=0-",
+                                    "Referer" to "${vidrockAPI}/"
+                                )
+                            }
+                        )
+                    }
+                } else {
+                    callback.invoke(
+                        newExtractorLink(
+                            "Vidrock",
+                            "Vidrock [${source.key.capitalize()}]",
+                            source.value["url"] ?: return@map,
+                            ExtractorLinkType.M3U8
+                        ) {
+                            this.referer = "${vidrockAPI}/"
+                            this.headers = mapOf(
+                                "Origin" to vidrockAPI
+                            )
+                        }
+                    )
+                }
+            }
+
+        val subUrl = "$subAPI/$type/$tmdbId${if(type == "movie") "" else "/$season/$episode"}"
+        val res = app.get(subUrl).text
+        tryParseJson<ArrayList<VidrockSubtitle>>(res)?.map { subtitle ->
+            subtitleCallback.invoke(
+                SubtitleFile(
+                    subtitle.label?.replace(Regex("\\d"), "")?.replace(Regex("\\s+Hi"), "")?.trim() ?: return@map,
+                    subtitle.file ?: return@map,
+                )
+            )
+        }
+
+    }
+
 }
 

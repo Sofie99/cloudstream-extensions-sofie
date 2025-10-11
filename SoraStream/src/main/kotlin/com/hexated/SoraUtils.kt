@@ -408,6 +408,13 @@ fun fixUrl(url: String, domain: String): String {
     }
 }
 
+fun base64UrlEncode(input: ByteArray): String {
+    return base64Encode(input)
+        .replace("+", "-")
+        .replace("/", "_")
+        .replace("=", "")
+}
+
 fun Int.toRomanNumeral(): String = Symbol.closestBelow(this)
     .let { symbol ->
         if (symbol != null) {
@@ -432,13 +439,30 @@ private enum class Symbol(val decimalValue: Int) {
     }
 }
 
-object VidsrcHelper {
-    private fun base64UrlEncode(input: ByteArray): String {
-        return base64Encode(input)
-            .replace("+", "-")
-            .replace("/", "_")
-            .replace("=", "")
+object VidrockHelper {
+    private const val Ww = "x7k9mPqT2rWvY8zA5bC3nF6hJ2lK4mN9"
+
+    fun encrypt(
+        r: Int?,
+        e: String,
+        t: Int?,
+        n: Int?
+    ): String {
+        val s = if (e == "tv") "${r}_${t}_${n}" else r.toString()
+        val keyBytes = Ww.toByteArray(Charsets.UTF_8)
+        val ivBytes = Ww.substring(0, 16).toByteArray(Charsets.UTF_8)
+
+        val secretKey = SecretKeySpec(keyBytes, "AES")
+        val ivSpec = IvParameterSpec(ivBytes)
+
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec)
+        val encrypted = cipher.doFinal(s.toByteArray(Charsets.UTF_8))
+        return base64UrlEncode(encrypted)
     }
+}
+
+object VidsrcHelper {
 
     fun encryptAesCbc(plainText: String, keyText: String): String {
         val sha256 = MessageDigest.getInstance("SHA-256")

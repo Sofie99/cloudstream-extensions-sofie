@@ -7,6 +7,7 @@ import com.hexated.SoraExtractor.invokeMapple
 import com.hexated.SoraExtractor.invokeSuperembed
 import com.hexated.SoraExtractor.invokeVidfast
 import com.hexated.SoraExtractor.invokeVidlink
+import com.hexated.SoraExtractor.invokeVidrock
 import com.hexated.SoraExtractor.invokeVidsrc
 import com.hexated.SoraExtractor.invokeVidsrccc
 import com.hexated.SoraExtractor.invokeVidsrccx
@@ -64,6 +65,7 @@ open class SoraStream : TmdbProvider() {
         const val vixsrcAPI = "https://vixsrc.to"
         const val vidsrccxAPI = "https://vidsrc.cx"
         const val superembedAPI = "https://multiembed.mov"
+        const val vidrockAPI = "https://vidrock.net"
 
         fun getType(t: String?): TvType {
             return when (t) {
@@ -354,6 +356,15 @@ open class SoraStream : TmdbProvider() {
             },
             {
                 invokeSuperembed(
+                    res.id,
+                    res.season,
+                    res.episode,
+                    subtitleCallback,
+                    callback
+                )
+            },
+            {
+                invokeVidrock(
                     res.id,
                     res.season,
                     res.episode,

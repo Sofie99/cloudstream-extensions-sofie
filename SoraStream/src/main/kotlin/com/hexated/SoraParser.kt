@@ -17,6 +17,16 @@ data class VixsrcSource(
     val referer: String,
 )
 
+data class VidrockSource(
+    @JsonProperty("resolution") val resolution: Int? = null,
+    @JsonProperty("url") val url: String? = null,
+)
+
+data class VidrockSubtitle(
+    @JsonProperty("label") val label: String? = null,
+    @JsonProperty("file") val file: String? = null,
+)
+
 data class VidsrccxSource(
     @JsonProperty("secureUrl") val secureUrl: String? = null,
 )
