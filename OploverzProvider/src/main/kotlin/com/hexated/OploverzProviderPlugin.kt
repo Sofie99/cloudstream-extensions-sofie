@@ -12,5 +12,6 @@ class OploverzProviderPlugin: Plugin() {
         registerMainAPI(OploverzProvider())
         registerExtractorAPI(Qiwi())
         registerExtractorAPI(Filedon())
+        registerExtractorAPI(Buzzheavier())
     }
 }

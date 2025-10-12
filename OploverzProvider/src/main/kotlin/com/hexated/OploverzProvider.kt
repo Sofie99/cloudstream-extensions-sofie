@@ -1,20 +1,22 @@
 package com.hexated
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
 import com.lagradost.cloudstream3.utils.*
 import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
+import org.jsoup.nodes.Document
+
 
 class OploverzProvider : MainAPI() {
-    override var mainUrl = "https://oploverz.media"
+    override var mainUrl = "https://anime.oploverz.ac"
+    private val backAPI = "https://backapi.oploverz.ac"
     override var name = "Oploverz"
     override val hasMainPage = true
     override var lang = "id"
-    override val hasDownloadSupport = true
-
+    override val hasQuickSearch = true
     override val supportedTypes = setOf(
         TvType.Anime,
         TvType.AnimeMovie,
@@ -23,113 +25,115 @@ class OploverzProvider : MainAPI() {
 
     companion object {
         fun getType(t: String): TvType {
-            return if (t.contains("OVA", true) || t.contains("Special")) TvType.OVA
-            else if (t.contains("Movie", true)) TvType.AnimeMovie
-            else TvType.Anime
-        }
-
-        fun getStatus(t: String?): ShowStatus {
-            return when (t) {
-                "Finished Airing" -> ShowStatus.Completed
-                "Completed" -> ShowStatus.Completed
-                "Currently Airing" -> ShowStatus.Ongoing
-                "Ongoing" -> ShowStatus.Ongoing
-                else -> ShowStatus.Completed
+            return when {
+                t.contains("Serial TV", true) -> TvType.Anime
+                t.contains("OVA", true) -> TvType.OVA
+                t.contains("Movie", true) || t.contains("BD", true) -> TvType.AnimeMovie
+                else -> TvType.Anime
             }
         }
 
+        fun getStatus(t: String?): ShowStatus {
+            return when {
+                t?.contains("Berlangsung", true) == true -> ShowStatus.Ongoing
+                else -> ShowStatus.Completed
+            }
+        }
     }
 
     override val mainPage = mainPageOf(
-        "" to "Latest Update",
-        "latest" to "Latest Added",
-        "popular" to "Popular Anime",
-        "rating" to "Top Rated",
+        "latest" to "Rilis Terbaru",
     )
 
     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        val url =
-            if (request.data.isEmpty()) "$mainUrl/page/$page/" else "$mainUrl/anime/?page=$page&status=&type=&order=${request.data}"
-        val document = app.get(url).document
-        val home = document.select("div.listupd > article, div.listupd.normal div.excstf > article")
-            .mapNotNull {
+        val home = app.get("$backAPI/api/episodes?page=$page&pageSize=24&sort=${request.data}")
+            .parsedSafe<Anime>()?.data?.map {
                 it.toSearchResult()
+            } ?: throw ErrorLoadingException()
+        return newHomePageResponse(
+            request.name,
+            home
+        )
+    }
+
+    private fun Data.toSearchResult(): AnimeSearchResponse {
+        return newAnimeSearchResponse(
+            series?.title ?: "",
+            "$mainUrl/series/${series?.slug}",
+            TvType.Anime
+        ) {
+            this.otherName = series?.japaneseTitle
+            this.posterUrl = series?.poster
+            this.score = Score.from10(series?.score)
+            addSub((episodeNumber?.toIntOrNull() ?: series?.totalEpisodes))
+        }
+    }
+
+    override suspend fun quickSearch(query: String): List<SearchResponse>? = search(query)
+
+    override suspend fun search(query: String): List<SearchResponse>? {
+        return app.get("$backAPI/api/series?q=$query")
+            .parsedSafe<SearchAnime>()?.data?.map {
+                newAnimeSearchResponse(
+                    it.title ?: "",
+                    "$mainUrl/series/${it.slug}",
+                    TvType.Anime
+                ) {
+                    this.otherName = it.japaneseTitle
+                    this.posterUrl = it.poster
+                    this.score = Score.from10(it.score)
+                    addSub(it.totalEpisodes)
+                }
             }
-        return newHomePageResponse(request.name, home)
     }
 
-    private suspend fun getProperAnimeLink(uri: String): String? {
-        return if (uri.contains("/anime/")) {
-            uri
-        } else {
-            app.get(uri).document.selectFirst("a[itemprop=item][href*=/anime/]")?.attr("href")
-        }
-    }
-
-    private fun Element.toSearchResult(): AnimeSearchResponse {
-        val href = fixUrlNull(this.selectFirst("a")?.attr("href")).toString()
-        val title = this.select("div.tt").text().trim()
-        val posterUrl = fixUrlNull(this.selectFirst("img")?.getImageAttr())
-        val epNum =
-            this.selectFirst("div.eggepisode")?.text()?.filter { it.isDigit() }?.toIntOrNull()
-        return newAnimeSearchResponse(title, href, TvType.Anime) {
-            this.posterUrl = posterUrl
-            addSub(epNum)
-        }
-    }
-
-    override suspend fun search(query: String): List<SearchResponse> {
-        val anime = mutableListOf<SearchResponse>()
-        (1..2).forEach { page ->
-            val link = "$mainUrl/page/$page/?s=$query"
-            val document = app.get(link).document
-            val media = document.select("div.listupd > article").mapNotNull {
-                it.toSearchResult()
-            }
-            if (media.isNotEmpty()) anime.addAll(media)
-        }
-        return anime
+    private fun Document.selectList(selector: String): String {
+        return this.select("ul.grid.list-inside li:contains($selector:)").text().substringAfter(":")
     }
 
     override suspend fun load(url: String): LoadResponse {
-        val fixUrl = getProperAnimeLink(url) ?: throw ErrorLoadingException("Could not load")
-        val document = app.get(fixUrl).document
+        val document = app.get(url).body.string().let { Jsoup.parse(it) }
 
-        val title = document.selectFirst("h1.entry-title")?.text()
-            ?.replace("Subtitle Indonesia", "")?.trim() ?: ""
-        val type = getType(
-            document.selectFirst("div.info-content span:contains(Type:)")?.text()
-                ?.substringAfter(":")?.trim() ?: "TV"
-        )
-        val year =
-            document.selectFirst("div.alternati a")?.text()?.filter { it.isDigit() }?.toIntOrNull()
-        val episodes = document.select("div.eplister ul li").mapNotNull {
-            val header = it.selectFirst("a") ?: return@mapNotNull null
-            val episode = it.select("div.epl-num").text().toIntOrNull()
-            val link = fixUrl(header.attr("href"))
-            newEpisode(link) { this.episode = episode }
-        }.reversed()
+        val title = document.selectFirst("p.text-2xl.font-semibold")?.text() ?: ""
+        val poster = document.selectFirst("img.h-full.w-full")
+            ?.attr("src")
+        val tags = document.selectList("Genre").split(",")
+            .map { it.trim() }
+
+        val year = document.selectList("Tanggal Rilis").let {
+            Regex("\\d{4}").find(it)?.groupValues?.get(0)?.toIntOrNull()
+        }
+        val status = getStatus(document.selectList("Status").trim())
+        val type = getType(document.selectList("Tipe"))
+        val description = document.select("div.flex.w-full p").text().trim()
+
+        val episodes =
+            document.select("a.ring-offset-background.gap-2").mapIndexedNotNull { index, element ->
+                val episode =
+                    element.select("p:first-child").text().filter { it.isDigit() }.toIntOrNull()
+                        ?: (index + 1)
+                val link = fixUrl(element.attr("href"))
+                newEpisode(url = link, initializer = { this.episode = episode }, fix = false)
+            }.reversed()
 
         val tracker = APIHolder.getTracker(listOf(title), TrackerType.getTypes(type), year, true)
 
         return newAnimeLoadResponse(title, url, type) {
-            posterUrl = tracker?.image ?: document.selectFirst("div.thumb > img")?.attr("src")
-            backgroundPosterUrl = tracker?.cover
+            engName = title
+            posterUrl = tracker?.image ?: poster
+            backgroundPosterUrl = tracker?.cover ?: poster
             this.year = year
             addEpisodes(DubStatus.Subbed, episodes)
-            showStatus =
-                getStatus(
-                    document.selectFirst("div.alternati span:nth-child(2)")?.text()?.trim()
-                )
-            plot = document.selectFirst("div.entry-content > p")?.text()?.trim()
-            this.tags =
-                document.select("div.genre-info a").map { it.text() }
+            showStatus = status
+            plot = description
+            this.tags = tags
             addMalId(tracker?.malId)
             addAniListId(tracker?.aniId?.toIntOrNull())
         }
+
     }
 
     override suspend fun loadLinks(
@@ -139,39 +143,23 @@ class OploverzProvider : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
 
-        val document = app.get(data).document
+        val doc = app.get(data).document
 
-        argamap(
-            {
-                document.select(".mobius > .mirror > option").apmap {
-                    val iframe = fixUrl(
-                        Jsoup.parse(base64Decode(it.attr("value"))).select("iframe").attr("src")
-                    )
-                    loadExtractor(fixUrl(iframe), "$mainUrl/", subtitleCallback, callback)
-                }
-            },
-            {
-                document.select("div.soraurlx").apmap { el ->
-                    el.select("a").apmap {
-                        loadFixedExtractor(
-                            fixUrl(it.attr("href")),
-                            "$mainUrl/",
-                            el.select("strong").text(),
-                            subtitleCallback,
-                            callback
-                        )
-                    }
-                }
+        doc.select("div.flex.flex-row.items-start").amap { selector ->
+            val quality = getQuality(selector.select("div.w-20 > p").text().trim())
+
+            selector.select("div.flex.flex-row.flex-wrap > a").amap { server ->
+                loadFixedExtractor(server.attr("href"), quality, null, subtitleCallback, callback)
             }
-        )
+        }
 
         return true
     }
 
     private suspend fun loadFixedExtractor(
         url: String,
+        quality: Int?,
         referer: String? = null,
-        quality: String,
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
@@ -185,8 +173,7 @@ class OploverzProvider : MainAPI() {
                         link.type
                     ) {
                         this.referer = link.referer
-                        this.quality =
-                            if (link.type == ExtractorLinkType.M3U8) link.quality else quality.fixQuality()
+                        this.quality = quality ?: Qualities.Unknown.value
                         this.headers = link.headers
                         this.extractorData = link.extractorData
                     }
@@ -195,22 +182,46 @@ class OploverzProvider : MainAPI() {
         }
     }
 
-    private fun String.fixQuality(): Int {
-        return when (this) {
-            "MP4HD" -> Qualities.P720.value
-            "FULLHD" -> Qualities.P1080.value
-            else -> Regex("(\\d{3,4})p").find(this)?.groupValues?.get(1)?.toIntOrNull()
-                ?: Qualities.Unknown.value
+    private fun getQuality(quality: String) : Int {
+        return when {
+            quality.equals("Mini", false) -> Qualities.P480.value
+            quality.equals("HD", false) -> Qualities.P720.value
+            quality.equals("FHD", false) -> Qualities.P1080.value
+            else -> {
+                getQualityFromName(quality)
+            }
         }
     }
 
-    private fun Element.getImageAttr(): String? {
-        return when {
-            this.hasAttr("data-src") -> this.attr("abs:data-src")
-            this.hasAttr("data-lazy-src") -> this.attr("abs:data-lazy-src")
-            this.hasAttr("srcset") -> this.attr("abs:srcset").substringBefore(" ")
-            else -> this.attr("abs:src")
-        }
-    }
+    data class Sources(
+        @JsonProperty("format") val format: String? = null,
+        @JsonProperty("url") val url: ArrayList<String>? = arrayListOf(),
+    )
+
+    data class Anime(
+        @JsonProperty("data") val data: ArrayList<Data>? = arrayListOf(),
+    )
+
+    data class SearchAnime(
+        @JsonProperty("data") val data: ArrayList<Series>? = arrayListOf(),
+    )
+
+    data class Data(
+        @JsonProperty("episodeNumber") val episodeNumber: String? = null,
+        @JsonProperty("subbed") val subbed: String? = null,
+        @JsonProperty("series") val series: Series? = null,
+    )
+
+    data class Series(
+        @JsonProperty("id") val id: Int? = null,
+        @JsonProperty("seriesId") val seriesId: Int? = null,
+        @JsonProperty("title") val title: String? = null,
+        @JsonProperty("japaneseTitle") val japaneseTitle: String? = null,
+        @JsonProperty("slug") val slug: String? = null,
+        @JsonProperty("releaseDate") val releaseDate: String? = null,
+        @JsonProperty("poster") val poster: String? = null,
+        @JsonProperty("score") val score: Int? = null,
+        @JsonProperty("totalEpisodes") val totalEpisodes: Int? = null,
+    )
 
 }

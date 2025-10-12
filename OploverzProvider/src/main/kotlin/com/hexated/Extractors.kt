@@ -86,3 +86,35 @@ open class Filedon : ExtractorApi() {
     )
 
 }
+
+open class Buzzheavier : ExtractorApi() {
+    override val name = "Buzzheavier"
+    override val mainUrl = "https://buzzheavier.com"
+    override val requiresReferer = false
+
+    override suspend fun getUrl(
+        url: String,
+        referer: String?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ) {
+        val path = url.substringAfterLast("/")
+
+        val video = app.get(fixUrl("$path/download"), headers = mapOf(
+            "HX-Current-URL" to url,
+            "HX-Request" to "true"
+        ), referer = url).headers["hx-redirect"]
+
+        callback.invoke(
+            newExtractorLink(
+                this.name,
+                this.name,
+                video ?: return
+            ) {
+                this.referer = "$mainUrl/"
+            }
+        )
+
+    }
+
+}
