@@ -247,7 +247,7 @@ object SoraExtractor : SoraStream() {
         val userId = script.substringAfter("userId = \"").substringBefore("\";")
         val v = script.substringAfter("v = \"").substringBefore("\";")
 
-        val vrf = VidsrcHelper.encryptAesCbc("$tmdbId", userId)
+        val vrf = VidsrcHelper.encryptAesCbc("$tmdbId", "secret_$userId")
 
         val serverUrl = if (season == null) {
             "$vidsrcccAPI/api/$tmdbId/servers?id=$tmdbId&type=movie&v=$v&vrf=$vrf&imdbId=$imdbId"
@@ -505,9 +505,9 @@ object SoraExtractor : SoraStream() {
         }
 
         val data = if (season == null) {
-            """[{"mediaId":$tmdbId,"mediaType":"$mediaType","tv_slug":"","source":"mapple"}]"""
+            """[{"mediaId":$tmdbId,"mediaType":"$mediaType","tv_slug":"","source":"mapple","sessionId":"session_1760391974726_qym92bfxu"}]"""
         } else {
-            """[{"mediaId":$tmdbId,"mediaType":"$mediaType","tv_slug":"$season-$episode","source":"mapple"}]"""
+            """[{"mediaId":$tmdbId,"mediaType":"$mediaType","tv_slug":"$season-$episode","source":"mapple","sessionId":"session_1760391974726_qym92bfxu"}]"""
         }
 
         val headers = mapOf(
