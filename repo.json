@@ -3,6 +3,6 @@
     "description": "HexatedRepo",
     "manifestVersion": 1,
     "pluginLists": [
-      "https://raw.githubusercontent.com/amanhnb88/cloudstream-extensions-aman88/builds/repo.json"
+      "https://raw.githubusercontent.com/amanhnb88/cloudstream-extensions-aman88/builds/plugins.json"
     ]
 }
