@@ -1,0 +1,644 @@
+[
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=animasu.cc&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/amanhnb88/cloudstream-extensions-aman88",
+        "fileSize": 23228,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "OVA",
+            "Anime"
+        ],
+        "version": 10,
+        "internalName": "Animasu",
+        "url": "https://raw.githubusercontent.com/amanhnb88/cloudstream-extensions-aman88/builds/Animasu.cs3",
+        "name": "Animasu"
+    },
+    {
+        "iconUrl": "https://animeindo.quest/wp-content/uploads/2023/05/favicon-300x300.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/amanhnb88/cloudstream-extensions-aman88",
+        "fileSize": 14756,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "OVA",
+            "Anime"
+        ],
+        "version": 15,
+        "internalName": "AnimeIndoProvider",
+        "url": "https://raw.githubusercontent.com/amanhnb88/cloudstream-extensions-aman88/builds/AnimeIndoProvider.cs3",
+        "name": "AnimeIndoProvider"
+    },
+    {
+        "iconUrl": "https://aghanim.xyz/wp-content/themes/animesail/assets/images/ico.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/amanhnb88/cloudstream-extensions-aman88",
+        "fileSize": 16850,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 11,
+        "internalName": "AnimeSailProvider",
+        "url": "https://raw.githubusercontent.com/amanhnb88/cloudstream-extensions-aman88/builds/AnimeSailProvider.cs3",
+        "name": "AnimeSailProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=dramaid.asia&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/amanhnb88/cloudstream-extensions-aman88",
+        "fileSize": 17576,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "Movie"
+        ],
+        "version": 12,
+        "internalName": "DramaidProvider",
+        "description": "Include: Oppadrama",
+        "url": "https://raw.githubusercontent.com/amanhnb88/cloudstream-extensions-aman88/builds/DramaidProvider.cs3",
+        "name": "DramaidProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=149.3.170.35&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/amanhnb88/cloudstream-extensions-aman88",
+        "fileSize": 17511,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AsianDrama"
+        ],
+        "version": 7,
+        "internalName": "DramaSerial",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/DramaSerial.cs3",
+        "name": "DramaSerial"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dubbindo.xyz&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 12571,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie",
+            "Cartoon",
+            "Anime"
+        ],
+        "version": 1,
+        "internalName": "Dubbindo",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Dubbindo.cs3",
+        "name": "Dubbindo"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=gomov.bio&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 32262,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 33,
+        "internalName": "Gomov",
+        "description": "Includes: DutaMovie, Ngefilm, Nodrakorid, Multiplex, Pusatfilm",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Gomov.cs3",
+        "name": "Gomov"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=hentaihaven.xxx&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 15089,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Sora"
+        ],
+        "tvTypes": [
+            "NSFW"
+        ],
+        "version": 4,
+        "internalName": "Hentaiheaven",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Hentaiheaven.cs3",
+        "name": "Hentaiheaven"
+    },
+    {
+        "iconUrl": "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://idlixian.com&size=16",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 22906,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie",
+            "Anime",
+            "AsianDrama"
+        ],
+        "version": 20,
+        "internalName": "IdlixProvider",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/IdlixProvider.cs3",
+        "name": "IdlixProvider"
+    },
+    {
+        "iconUrl": "https://i.pinimg.com/736x/cc/27/87/cc27877a05d2d0a5727c838435f90c01.jpg",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 14590,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "Live"
+        ],
+        "version": 3,
+        "internalName": "IndonesiaTV",
+        "description": "Live Stream",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/IndonesiaTV.cs3",
+        "name": "IndonesiaTV"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=kissasian.pe&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 15713,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AsianDrama"
+        ],
+        "version": 3,
+        "internalName": "Kissasian",
+        "description": "Include: KissasianMx",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Kissasian.cs3",
+        "name": "Kissasian"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=kisskh.co&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 18907,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Anime",
+            "Movie"
+        ],
+        "version": 4,
+        "internalName": "KisskhProvider",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/KisskhProvider.cs3",
+        "name": "KisskhProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=kuramanime.com&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 28986,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 40,
+        "internalName": "KuramanimeProvider",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/KuramanimeProvider.cs3",
+        "name": "KuramanimeProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=45.12.2.2&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 24823,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 21,
+        "internalName": "KuronimeProvider",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/KuronimeProvider.cs3",
+        "name": "KuronimeProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=amp.lk21official.mom&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 20024,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 21,
+        "internalName": "LayarKacaProvider",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/LayarKacaProvider.cs3",
+        "name": "LayarKacaProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=loklok.com&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 34034,
+        "status": 0,
+        "language": "en",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "Anime",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 26,
+        "internalName": "Loklok",
+        "description": "#2 best extension based on Loklok API",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Loklok.cs3",
+        "name": "Loklok"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=minioppai.org&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 19835,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Sora"
+        ],
+        "tvTypes": [
+            "NSFW"
+        ],
+        "version": 11,
+        "internalName": "Minioppai",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Minioppai.cs3",
+        "name": "Minioppai"
+    },
+    {
+        "iconUrl": "https://moviebox.ph/favicon.ico",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/amanhnb88/cloudstream-extensions-aman88",
+        "fileSize": 27261,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie",
+            "Anime",
+            "AsianDrama"
+        ],
+        "version": 4,
+        "internalName": "Moviebox",
+        "url": "https://raw.githubusercontent.com/amanhnb88/cloudstream-extensions-aman88/builds/Moviebox.cs3",
+        "name": "Moviebox"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=nekopoi.care&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 23318,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Sora"
+        ],
+        "tvTypes": [
+            "NSFW"
+        ],
+        "version": 6,
+        "internalName": "Nekopoi",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Nekopoi.cs3",
+        "name": "Nekopoi"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=neonime.ink&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 15695,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "Movie",
+            "OVA"
+        ],
+        "version": 9,
+        "internalName": "NeonimeProvider",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/NeonimeProvider.cs3",
+        "name": "NeonimeProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=nimegami.id&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 22329,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 12,
+        "internalName": "Nimegami",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Nimegami.cs3",
+        "name": "Nimegami"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=nontonanimeid.org&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 23415,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 22,
+        "internalName": "NontonAnimeIDProvider",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/NontonAnimeIDProvider.cs3",
+        "name": "NontonAnimeIDProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=oploverz.care&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 25222,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 32,
+        "internalName": "OploverzProvider",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/OploverzProvider.cs3",
+        "name": "OploverzProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=otakudesu.watch&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 22189,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 17,
+        "internalName": "OtakudesuProvider",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/OtakudesuProvider.cs3",
+        "name": "OtakudesuProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=en.paradisehill.cc&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 11731,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Sora"
+        ],
+        "tvTypes": [
+            "NSFW"
+        ],
+        "version": 4,
+        "internalName": "Paradisehill",
+        "description": "Series porn (use VPN if links not working)",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Paradisehill.cs3",
+        "name": "Paradisehill"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=179.43.163.54&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 22170,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "Anime",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 9,
+        "internalName": "RebahinProvider",
+        "description": "Includes: Cgvindo, Kitanonton",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/RebahinProvider.cs3",
+        "name": "RebahinProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=https://samehadaku.world&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 17279,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "OVA",
+            "Anime"
+        ],
+        "version": 24,
+        "internalName": "Samehadaku",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Samehadaku.cs3",
+        "name": "Samehadaku"
+    },
+    {
+        "iconUrl": "https://cdn.discordapp.com/attachments/1109266606292488297/1193122096159674448/2-modified.png?ex=65ec2a0a&is=65d9b50a&hm=f1e0b0165e71101e5440b47592d9e15727a6c00cdeb3512108067bfbdbef1af7&",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 137523,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Hexated",
+            "Sora"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "TvSeries",
+            "Anime",
+            "Movie"
+        ],
+        "version": 246,
+        "internalName": "SoraStream",
+        "description": "#1 best extention based on MultiAPI",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/SoraStream.cs3",
+        "name": "SoraStream"
+    },
+    {
+        "iconUrl": "https://raw.githubusercontent.com/hexated/cloudstream-extensions-hexated/master/StremioX/icon.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 70967,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 13,
+        "internalName": "StremioX",
+        "description": "[!] Requires Setup \n- StremioX allows you to use stream addons \n- StremioC allows you to use catalog addons",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/StremioX.cs3",
+        "name": "StremioX"
+    },
+    {
+        "iconUrl": "https://cdn.discordapp.com/attachments/1109266606292488297/1196694385061003334/icon.png?ex=65efee7e&is=65dd797e&hm=18fa57323826d0cbf3cf5ce7d3f5705de640f2f8d08739d41f95882d2ae0a3e0&",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 77671,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Blatzar"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "Anime",
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 5,
+        "internalName": "Superstream",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Superstream.cs3",
+        "name": "Superstream"
+    },
+    {
+        "iconUrl": "https://cdn.discordapp.com/attachments/1109266606292488297/1193088870212976640/Untitled.jpg?ex=65ec0b19&is=65d99619&hm=0eaf0f1926b6eb787b80c2eb3000ec9d77e2e706ab0601cad053ad8f677b8cc8&",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 16097,
+        "status": 1,
+        "language": "en",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "Live"
+        ],
+        "version": 24,
+        "internalName": "TimefourTv",
+        "description": "Sport Live Stream",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/TimefourTv.cs3",
+        "name": "TimefourTv"
+    },
+    {
+        "iconUrl": "https://zoronime.com/wp-content/themes/zoronime/favicon.png?v=0.06",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Sofie99/cloudstream-extensions-sofie",
+        "fileSize": 16976,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Hexated"
+        ],
+        "tvTypes": [
+            "AnimeMovie",
+            "OVA",
+            "Anime"
+        ],
+        "version": 2,
+        "internalName": "Zoronime",
+        "url": "https://raw.githubusercontent.com/Sofie99/cloudstream-extensions-sofie/builds/Zoronime.cs3",
+        "name": "Zoronime"
+    }
+]
