@@ -3,6 +3,7 @@ package com.hexated
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.mvvm.safeApiCall
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
@@ -151,11 +152,10 @@ class AnimeSailProvider : MainAPI() {
 
         val document = request(data).document
 
-        document.select(".mobius > .mirror > option").apmap {
+        document.select(".mobius > .mirror > option").amap {
             safeApiCall {
                 val iframe = fixUrl(
                     Jsoup.parse(base64Decode(it.attr("data-em"))).select("iframe").attr("src")
-                        ?: throw ErrorLoadingException("No iframe found")
                 )
                 val quality = getIndexQuality(it.text())
                 when {
@@ -167,12 +167,12 @@ class AnimeSailProvider : MainAPI() {
                             val link = Jsoup.parse(it).select("source").last()?.attr("src")
                             callback.invoke(
                                 newExtractorLink(
-                                    source = this.name,
-                                    name = this.name,
+                                    source = name,
+                                    name = name,
                                     url = link ?: return@let,
                                     INFER_TYPE
                                 ) {
-                                    this.referer = mainUrl
+                                    referer = mainUrl
                                     this.quality = quality
                                 }
                             )
@@ -189,7 +189,7 @@ class AnimeSailProvider : MainAPI() {
                                     iframe.contains("/race/") -> "Race"
                                     iframe.contains("/hexupload/") -> "Hexupload"
                                     iframe.contains("/pomf/") -> "Pomf"
-                                    else -> this.name
+                                    else -> name
                                 }
                             callback.invoke(
                                 newExtractorLink(
@@ -198,14 +198,14 @@ class AnimeSailProvider : MainAPI() {
                                     url = link,
                                     INFER_TYPE
                                 ) {
-                                    this.referer = mainUrl
+                                    referer = mainUrl
                                     this.quality = quality
                                 }
                             )
                         }
-//                    skip for now
-//                    iframe.startsWith("$mainUrl/utils/player/fichan/") -> ""
-//                    iframe.startsWith("$mainUrl/utils/player/blogger/") -> ""
+                    //                    skip for now
+                    //                    iframe.startsWith("$mainUrl/utils/player/fichan/") -> ""
+                    //                    iframe.startsWith("$mainUrl/utils/player/blogger/") -> ""
                     iframe.startsWith("https://aghanim.xyz/tools/redirect/") -> {
                         val link = "https://rasa-cintaku-semakin-berantai.xyz/v/${
                             iframe.substringAfter("id=").substringBefore("&token")
