@@ -583,7 +583,7 @@ open class Superstream : MainAPI() {
                 this.year = data.year
                 this.plot = data.description
                 this.tags = data.cats?.split(",")?.map { it.capitalize() }
-                this.rating = data.imdbRating?.split("/")?.get(0)?.toIntOrNull()
+                this.score = Score.from10(data.imdbRating?.split("/")?.get(0)?.toIntOrNull())
                 addTrailer(data.trailerUrl)
                 this.addImdbId(data.imdbId)
             }
@@ -624,7 +624,7 @@ open class Superstream : MainAPI() {
                         episode = it.episode
                         posterUrl = it.thumbs ?: it.thumbsBak ?: it.thumbsMin ?: it.thumbsOriginal
                                 ?: it.thumbsOrg
-                        rating = it.imdbRating?.toDoubleOrNull()?.times(10)?.roundToInt()
+                        score = Score.from10(it.imdbRating?.toDoubleOrNull()?.times(10)?.roundToInt())
                         description = it.synopsis
                         date = it.releasedTimestamp
                     }
@@ -633,7 +633,7 @@ open class Superstream : MainAPI() {
                 this.year = data.year
                 this.plot = data.description
                 this.posterUrl = data.posterOrg ?: data.poster
-                this.rating = data.imdbRating?.split("/")?.get(0)?.toIntOrNull()
+                this.score = Score.from10(data.imdbRating?.split("/")?.get(0)?.toIntOrNull())
                 this.tags = data.cats?.split(",")?.map { it.capitalize() }
                 this.addImdbId(data.imdbId)
             }
