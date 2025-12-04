@@ -247,7 +247,7 @@ object SoraExtractor : SoraStream() {
         val userId = script.substringAfter("userId = \"").substringBefore("\";")
         val v = script.substringAfter("v = \"").substringBefore("\";")
 
-        val vrf = VidsrcHelper.encryptAesCbc("$tmdbId", "secret_$userId")
+        val vrf = VidsrcHelper.encryptAesCbc("$tmdbId", "RNckJONvMn_$userId")
 
         val serverUrl = if (season == null) {
             "$vidsrcccAPI/api/$tmdbId/servers?id=$tmdbId&type=movie&v=$v&vrf=$vrf&imdbId=$imdbId"
