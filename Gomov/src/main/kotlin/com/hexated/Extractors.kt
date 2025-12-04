@@ -1,6 +1,7 @@
 package com.hexated
 
 import com.lagradost.cloudstream3.SubtitleFile
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.apmap
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.base64Decode
@@ -43,8 +44,13 @@ open class Kotakajaib : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        app.get(url,referer=referer).document.select("ul#dropdown-server li a").apmap {
-            loadExtractor(base64Decode(it.attr("data-frame")), "$mainUrl/", subtitleCallback, callback)
+        app.get(url, referer = referer).document.select("ul#dropdown-server li a").amap {
+            loadExtractor(
+                base64Decode(it.attr("data-frame")),
+                "$mainUrl/",
+                subtitleCallback,
+                callback
+            )
         }
     }
 
