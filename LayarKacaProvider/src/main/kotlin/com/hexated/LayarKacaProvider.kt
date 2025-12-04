@@ -3,6 +3,7 @@ package com.hexated
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.*
 import org.jsoup.nodes.Element
 
@@ -101,7 +102,7 @@ class LayarKacaProvider : MainAPI() {
         val description = document.select("div.content > blockquote").text().trim()
         val trailer = document.selectFirst("div.action-player li > a.fancybox")?.attr("href")
         val rating =
-                document.selectFirst("div.content > div:nth-child(6) > h3")?.text()?.toRatingInt()
+                document.selectFirst("div.content > div:nth-child(6) > h3")?.text()?.toIntOrNull()
         val actors =
                 document.select("div.col-xs-9.content > div:nth-child(3) > h3 > a").map { it.text() }
 
@@ -132,7 +133,7 @@ class LayarKacaProvider : MainAPI() {
                 this.year = year
                 this.plot = description
                 this.tags = tags
-                this.rating = rating
+                this.score = Score.from10(rating)
                 addActors(actors)
                 this.recommendations = recommendations
                 addTrailer(trailer)
@@ -143,7 +144,7 @@ class LayarKacaProvider : MainAPI() {
                 this.year = year
                 this.plot = description
                 this.tags = tags
-                this.rating = rating
+                this.score = Score.from10(rating)
                 addActors(actors)
                 this.recommendations = recommendations
                 addTrailer(trailer)
@@ -160,8 +161,8 @@ class LayarKacaProvider : MainAPI() {
 
         val document = app.get(data).document
         document.select("ul#loadProviders > li").map {
-            fixUrl(it.select("a").attr("href"))
-        }.apmap {
+                fixUrl(it.select("a").attr("href"))
+            }.amap {
             loadExtractor(it.getIframe(), "https://nganunganu.sbs", subtitleCallback, callback)
         }
 

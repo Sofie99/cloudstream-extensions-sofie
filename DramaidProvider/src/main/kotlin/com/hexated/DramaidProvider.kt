@@ -1,6 +1,7 @@
 package com.hexated
 
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.Jsoup
@@ -124,7 +125,7 @@ open class DramaidProvider : MainAPI() {
             fixUrl(Jsoup.parse(base64Decode(it.attr("value"))).select("iframe").attr("src"))
         }
 
-        sources.apmap {
+        sources.amap {
             loadExtractor(it, "$mainUrl/", subtitleCallback, callback)
         }
 

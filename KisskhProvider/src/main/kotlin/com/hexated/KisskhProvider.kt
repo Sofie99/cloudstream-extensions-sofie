@@ -2,6 +2,7 @@ package com.hexated
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.mvvm.safeApiCall
 import com.lagradost.cloudstream3.utils.AppUtils.parseJson
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
@@ -130,11 +131,11 @@ class KisskhProvider : MainAPI() {
             "$mainUrl/api/DramaList/Episode/${loadData.epsId}.png?err=false&ts=&time=",
             referer = "$mainUrl/Drama/${getTitle("${loadData.title}")}/Episode-${loadData.eps}?id=${loadData.id}&ep=${loadData.epsId}&page=0&pageSize=100"
         ).parsedSafe<Sources>()?.let { source ->
-            listOf(source.video, source.thirdParty).apmap { link ->
+            listOf(source.video, source.thirdParty).amap { link ->
                 safeApiCall {
                     if (link?.contains(".m3u8") == true) {
                         M3u8Helper.generateM3u8(
-                            this.name,
+                            name,
                             link,
                             referer = "$mainUrl/",
                             headers = mapOf("Origin" to mainUrl)

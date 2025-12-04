@@ -2,6 +2,7 @@ package com.hexated
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -128,8 +129,8 @@ class Minioppai : MainAPI() {
     ): Boolean {
         val document = app.get(data).document
         document.select("div.server ul.mirror li a").mapNotNull {
-            Jsoup.parse(base64Decode(it.attr("data-em"))).select("iframe").attr("src")
-        }.apmap { link ->
+                Jsoup.parse(base64Decode(it.attr("data-em"))).select("iframe").attr("src")
+            }.amap { link ->
             loadExtractor(
                 fixUrl(decode(link.substringAfter("data="))),
                 mainUrl,

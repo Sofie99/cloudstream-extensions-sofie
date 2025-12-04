@@ -1,6 +1,7 @@
 package com.hexated
 
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.AppUtils
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
@@ -118,10 +119,10 @@ class TimefourTv : MainAPI() {
 
         val json = AppUtils.parseJson<ArrayList<Channels>>(data)
 
-        json.apmap {
+        json.amap {
             val iframe = app.get(
                 fixChannelUrl(
-                    it.channel_id ?: return@apmap
+                    it.channel_id ?: return@amap
                 )
             ).document.selectFirst("iframe#thatframe")?.attr("src")
                 ?: throw ErrorLoadingException("No Iframe Found")
@@ -130,9 +131,9 @@ class TimefourTv : MainAPI() {
 
             callback.invoke(
                 newExtractorLink(
-                    this.name,
-                    it.channel_name ?: return@apmap,
-                    video ?: return@apmap,
+                    name,
+                    it.channel_name ?: return@amap,
+                    video ?: return@amap,
                     INFER_TYPE
                 ) {
                     referer = "$host/"

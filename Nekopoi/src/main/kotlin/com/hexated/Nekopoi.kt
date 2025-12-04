@@ -1,6 +1,7 @@
 package com.hexated
 
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.nicehttp.NiceResponse
 import com.lagradost.nicehttp.Requests
@@ -145,9 +146,9 @@ class Nekopoi : MainAPI() {
 
         val res = fetch.get(data).document
 
-        argamap(
+        runAllAsync(
             {
-                res.select("div#show-stream iframe").apmap { iframe ->
+                res.select("div#show-stream iframe").amap { iframe ->
                     loadExtractor(iframe.attr("src"), "$mainUrl/", subtitleCallback, callback)
                 }
             },
@@ -159,30 +160,30 @@ class Nekopoi : MainAPI() {
                         ?.attr("href")
                 }.filter { it.first != Qualities.P360.value }.map {
                     val bypassedAds = bypassMirrored(bypassOuo(it.second))
-                    bypassedAds.apmap ads@{ adsLink ->
-                        loadExtractor(
-                            fixEmbed(adsLink) ?: return@ads,
-                            "$mainUrl/",
-                            subtitleCallback,
-                        ) { link ->
-                            runBlocking {
-                                callback.invoke(
-                                    newExtractorLink(
-                                        link.name,
-                                        link.name,
-                                        link.url,
-                                        link.type
-                                    ) {
-                                        this.referer = link.referer
-                                        this.quality =
-                                            if (link.type == ExtractorLinkType.M3U8) link.quality else it.first
-                                        this.headers = link.headers
-                                        this.extractorData = link.extractorData
-                                    }
-                                )
-                            }
-                        }
-                    }
+                    bypassedAds.amap(ads@{ adsLink ->
+                                        loadExtractor(
+                                            fixEmbed(adsLink) ?: return@ads,
+                                            "$mainUrl/",
+                                            subtitleCallback,
+                                        ) { link ->
+                                            runBlocking {
+                                                callback.invoke(
+                                                    newExtractorLink(
+                                                        link.name,
+                                                        link.name,
+                                                        link.url,
+                                                        link.type
+                                                    ) {
+                                                        referer = link.referer
+                                                        quality =
+                                                            if (link.type == ExtractorLinkType.M3U8) link.quality else it.first
+                                                        headers = link.headers
+                                                        extractorData = link.extractorData
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    })
                 }
             }
         )
@@ -245,18 +246,18 @@ class Nekopoi : MainAPI() {
             app.get(nextUrl).selectMirror()
         }
         return session.get(
-            fixUrl(
-                mirrorUrl ?: return emptyList(),
-                mirroredHost
-            )
-        ).document.select("table.hoverable tbody tr")
-            .filter { mirror ->
-                !mirrorIsBlackList(mirror.selectFirst("img")?.attr("alt"))
-            }.apmap {
+                fixUrl(
+                    mirrorUrl ?: return emptyList(),
+                    mirroredHost
+                )
+            ).document.select("table.hoverable tbody tr")
+                .filter { mirror ->
+                    !mirrorIsBlackList(mirror.selectFirst("img")?.attr("alt"))
+                }.amap {
                 val fileLink = it.selectFirst("a")?.attr("href")
                 session.get(
                     fixUrl(
-                        fileLink ?: return@apmap null,
+                        fileLink ?: return@amap null,
                         mirroredHost
                     )
                 ).document.selectFirst("div.code_wrap code")?.text()

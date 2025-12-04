@@ -5,6 +5,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.utils.AppUtils.parseJson
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
@@ -61,7 +62,7 @@ class Loklok : MainAPI() {
                     home.add(HomePageList(header, media))
                 }
         }
-        return HomePageResponse(home)
+        return newHomePageResponse(home)
     }
 
     private fun Media.toSearchResponse(): SearchResponse? {
@@ -198,7 +199,7 @@ class Loklok : MainAPI() {
             this.year = res.year
             this.plot = res.introduction
             this.tags = res.tagNameList
-            this.rating = res.score.toRatingInt()
+            this.score = Score.from10(res.score?.toIntOrNull())
             addActors(actors)
             addMalId(malId)
             addAniListId(anilistId?.toIntOrNull())
@@ -225,7 +226,7 @@ class Loklok : MainAPI() {
     ): Boolean {
         val res = parseJson<UrlEpisode>(data)
 
-        res.definitionList?.apmap { video ->
+        res.definitionList?.amap { video ->
             val body =
                 """[{"category":${res.category},"contentId":"${res.id}","episodeId":${res.epId},"definition":"${video.code}"}]""".toRequestBody(
                     RequestBodyTypes.JSON.toMediaTypeOrNull()
@@ -238,7 +239,7 @@ class Loklok : MainAPI() {
                 newExtractorLink(
                     this.name,
                     this.name,
-                    json?.mediaUrl ?: return@apmap null,
+                    json?.mediaUrl ?: return@amap null,
                     INFER_TYPE
                 ) {
                     this.quality = getQuality(json.currentDefinition ?: "")

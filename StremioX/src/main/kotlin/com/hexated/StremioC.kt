@@ -7,6 +7,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addImdbId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.utils.AppUtils.parseJson
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
@@ -26,12 +27,12 @@ class StremioC : MainAPI() {
         mainUrl = mainUrl.fixSourceUrl()
         val res = app.get("${mainUrl}/manifest.json").parsedSafe<Manifest>()
         val lists = mutableListOf<HomePageList>()
-        res?.catalogs?.apmap { catalog ->
+        res?.catalogs?.amap { catalog ->
             catalog.toHomePageList(this).let {
                 if (it.list.isNotEmpty()) lists.add(it)
             }
         }
-        return HomePageResponse(
+        return newHomePageResponse(
             lists,
             false
         )
@@ -41,7 +42,7 @@ class StremioC : MainAPI() {
         mainUrl = mainUrl.fixSourceUrl()
         val res = app.get("${mainUrl}/manifest.json").parsedSafe<Manifest>()
         val list = mutableListOf<SearchResponse>()
-        res?.catalogs?.apmap { catalog ->
+        res?.catalogs?.amap { catalog ->
             list.addAll(catalog.search(query, this))
         }
         return list.distinct()
@@ -73,7 +74,7 @@ class StremioC : MainAPI() {
                 stream.runCallback(subtitleCallback, callback)
             }
         } else {
-            argamap(
+            runAllAsync(
                 {
                     invokeStremioX(loadData.type, loadData.id, subtitleCallback, callback)
                 },
@@ -107,7 +108,7 @@ class StremioC : MainAPI() {
     ) {
         val sites = AcraApplication.getKey<Array<CustomSite>>(USER_PROVIDER_API)?.toMutableList()
             ?: mutableListOf()
-        sites.filter { it.parentJavaClass == "StremioX" }.apmap { site ->
+        sites.filter { it.parentJavaClass == "StremioX" }.amap { site ->
             val res = app.get(
                 "${site.url.fixSourceUrl()}/stream/${type}/${id}.json",
                 timeout = 120L
@@ -223,7 +224,7 @@ class StremioC : MainAPI() {
                 ) {
                     posterUrl = poster
                     backgroundPosterUrl = background
-                    rating = imdbRating.toRatingInt()
+                    score = Score.from10(imdbRating?.toFloatOrNull())
                     plot = description
                     year = yearNum?.toIntOrNull()
                     tags = genre ?: genres
@@ -242,7 +243,7 @@ class StremioC : MainAPI() {
                 ) {
                     posterUrl = poster
                     backgroundPosterUrl = background
-                    rating = imdbRating.toRatingInt()
+                    score = Score.from10(imdbRating?.toFloatOrNull())
                     plot = description
                     year = yearNum?.toIntOrNull()
                     tags = genre ?: genres

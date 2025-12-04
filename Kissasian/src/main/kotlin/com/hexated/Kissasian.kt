@@ -110,12 +110,12 @@ open class Kissasian : MainAPI() {
         val iframe = app.get(httpsify(server ?: return false))
         val iframeDoc = iframe.document
 
-        argamap({
+        runAllAsync({
             iframeDoc.select(".list-server-items > .linkserver")
                 .forEach { element ->
-                    val status = element.attr("data-status") ?: return@forEach
+                    val status = element.attr("data-status")
                     if (status != "1") return@forEach
-                    val extractorData = element.attr("data-video") ?: return@forEach
+                    val extractorData = element.attr("data-video")
                     loadExtractor(extractorData, iframe.url, subtitleCallback, callback)
                 }
         }, {

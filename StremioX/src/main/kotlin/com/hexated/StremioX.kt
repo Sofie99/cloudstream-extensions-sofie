@@ -119,7 +119,7 @@ class StremioX : TmdbProvider() {
         val bgPoster = getOriImageUrl(res.backdropPath)
         val releaseDate = res.releaseDate ?: res.firstAirDate
         val year = releaseDate?.split("-")?.first()?.toIntOrNull()
-        val rating = res.vote_average.toString().toRatingInt()
+        val rating = res.vote_average.toString().toIntOrNull()
         val genres = res.genres?.mapNotNull { it.name }
         val isAnime =
             genres?.contains("Animation") == true && (res.original_language == "zh" || res.original_language == "ja")
@@ -156,7 +156,7 @@ class StremioX : TmdbProvider() {
                             this.season = eps.seasonNumber
                             this.episode = eps.episodeNumber
                             this.posterUrl = getImageUrl(eps.stillPath)
-                            this.rating = eps.voteAverage?.times(10)?.roundToInt()
+                            this.score = Score.from10(eps.voteAverage?.times(10)?.roundToInt())
                             this.description = eps.overview
                         }.apply {
                             this.addDate(eps.airDate)
@@ -171,7 +171,7 @@ class StremioX : TmdbProvider() {
                 this.year = year
                 this.plot = res.overview
                 this.tags = keywords.takeIf { !it.isNullOrEmpty() } ?: genres
-                this.rating = rating
+                this.score = Score.from10(rating)
                 this.showStatus = getStatus(res.status)
                 this.recommendations = recommendations
                 this.actors = actors
@@ -194,7 +194,7 @@ class StremioX : TmdbProvider() {
                 this.plot = res.overview
                 this.duration = res.runtime
                 this.tags = keywords.takeIf { !it.isNullOrEmpty() } ?: genres
-                this.rating = rating
+                this.score = Score.from10(rating)
                 this.recommendations = recommendations
                 this.actors = actors
                 this.contentRating = fetchContentRating(data.id, "US")
@@ -213,7 +213,7 @@ class StremioX : TmdbProvider() {
     ): Boolean {
         val res = parseJson<LoadData>(data)
 
-        argamap(
+        runAllAsync(
             {
                 invokeMainSource(res.imdbId, res.season, res.episode, subtitleCallback, callback)
             },

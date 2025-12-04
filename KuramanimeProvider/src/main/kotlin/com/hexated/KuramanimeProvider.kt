@@ -3,6 +3,7 @@ package com.hexated
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.INFER_TYPE
 import com.lagradost.cloudstream3.utils.Qualities
@@ -193,7 +194,7 @@ class KuramanimeProvider : MainAPI() {
             )
         }
         if (server == "kuramadrive") {
-            document.select("div#animeDownloadLink a").apmap {
+            document.select("div#animeDownloadLink a").amap {
                 loadExtractor(it.attr("href"), "$mainUrl/", subtitleCallback, callback)
             }
         }
@@ -235,7 +236,7 @@ class KuramanimeProvider : MainAPI() {
             "X-Requested-With" to "XMLHttpRequest",
         )
 
-        res.select("select#changeServer option").apmap { source ->
+        res.select("select#changeServer option").amap { source ->
             val server = source.attr("value")
             val link =
                 "$data?${assets.MIX_PAGE_TOKEN_KEY}=$tokenKey&${assets.MIX_STREAM_SERVER_KEY}=$server"

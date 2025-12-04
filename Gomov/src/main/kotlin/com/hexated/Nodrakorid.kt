@@ -2,6 +2,7 @@ package com.hexated
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
@@ -81,7 +82,7 @@ class Nodrakorid : Gomov() {
     ): Boolean {
         return if (data.startsWith("[")) {
             tryParseJson<ArrayList<LinkData>>(data)?.filter { it.first != 360 }?.map {
-                it.second.apmap { link ->
+                it.second.amap { link ->
                     loadFixedExtractor(
                         fixEmbed(link.first, link.second),
                         it.first,

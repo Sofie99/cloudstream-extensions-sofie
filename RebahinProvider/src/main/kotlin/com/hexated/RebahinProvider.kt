@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.mvvm.safeApiCall
 import com.lagradost.cloudstream3.utils.*
@@ -58,7 +59,7 @@ open class RebahinProvider : MainAPI() {
         }
 
         if (items.size <= 0) throw ErrorLoadingException()
-        return HomePageResponse(items)
+        return newHomePageResponse(items)
     }
 
     fun Element.toSearchResult(): SearchResponse? {
@@ -111,7 +112,7 @@ open class RebahinProvider : MainAPI() {
         val tvType = if (url.contains("/series/")) TvType.TvSeries else TvType.Movie
         val description = document.select("span[itemprop=reviewBody] > p").text().trim()
         val trailer = fixUrlNull(document.selectFirst("div.modal-body-trailer iframe")?.attr("src"))
-        val rating = document.selectFirst("span[itemprop=ratingValue]")?.text()?.toRatingInt()
+        val rating = document.selectFirst("span[itemprop=ratingValue]")?.text()?.toIntOrNull()
         val duration = document.selectFirst(".mvici-right > p:nth-child(1)")!!
             .ownText().replace(Regex("[^0-9]"), "").toIntOrNull()
         val actors = document.select("span[itemprop=actor] > a").map { it.select("span").text() }
@@ -135,7 +136,7 @@ open class RebahinProvider : MainAPI() {
                 this.year = year
                 this.plot = description
                 this.tags = tags
-                this.rating = rating
+                this.score = Score.from10(rating)
                 this.duration = duration
                 addActors(actors)
                 addTrailer(trailer)
@@ -151,7 +152,7 @@ open class RebahinProvider : MainAPI() {
                 this.year = year
                 this.plot = description
                 this.tags = tags
-                this.rating = rating
+                this.score = Score.from10(rating)
                 this.duration = duration
                 addActors(actors)
                 addTrailer(trailer)
@@ -166,7 +167,7 @@ open class RebahinProvider : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
 
-        data.removeSurrounding("[", "]").split(",").map { it.trim() }.apmap { link ->
+        data.removeSurrounding("[", "]").split(",").map { it.trim() }.amap { link ->
             safeApiCall {
                 when {
                     link.startsWith(mainServer) -> invokeLokalSource(
@@ -174,6 +175,7 @@ open class RebahinProvider : MainAPI() {
                         subtitleCallback,
                         callback
                     )
+
                     else -> {
                         loadExtractor(link, "$directUrl/", subtitleCallback, callback)
                     }

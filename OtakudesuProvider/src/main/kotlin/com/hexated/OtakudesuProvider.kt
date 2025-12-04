@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.extractors.Filesim
 import com.lagradost.cloudstream3.extractors.JWPlayer
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
@@ -170,7 +171,7 @@ class OtakudesuProvider : MainAPI() {
 
         val document = app.get(data).document
 
-        argamap(
+        runAllAsync(
             {
                 val scriptData =
                     document.select("script:containsData(action:)").lastOrNull()?.data()
@@ -187,7 +188,7 @@ class OtakudesuProvider : MainAPI() {
                     base64Decode(it.select("a").attr("data-content"))
                 }.toString()
 
-                tryParseJson<List<ResponseSources>>(mirrorData)?.apmap { res ->
+                tryParseJson<List<ResponseSources>>(mirrorData)?.amap { res ->
                     val id = res.id
                     val i = res.i
                     val q = res.q
@@ -214,10 +215,10 @@ class OtakudesuProvider : MainAPI() {
                 document.select("div.download li").map { ele ->
                     val quality = getQuality(ele.select("strong").text())
                     ele.select("a").map {
-                        it.attr("href") to it.text()
-                    }.filter {
-                        !inBlacklist(it.first) && quality != Qualities.P360.value
-                    }.apmap {
+                                        it.attr("href") to it.text()
+                                    }.filter {
+                                        !inBlacklist(it.first) && quality != Qualities.P360.value
+                                    }.amap {
                         val link = app.get(it.first, referer = "$mainUrl/").url
                         loadCustomExtractor(
                             fixedIframe(link),

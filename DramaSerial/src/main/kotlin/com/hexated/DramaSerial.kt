@@ -2,6 +2,7 @@ package com.hexated
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.extractors.Filesim
 import com.lagradost.cloudstream3.utils.AppUtils
 import com.lagradost.cloudstream3.utils.ExtractorLink
@@ -176,7 +177,7 @@ class DramaSerial : MainAPI() {
 
         val iframe = document.select("iframe[name=juraganfilm]").attr("src")
         app.get(iframe, referer = "$mainUrl/").document.select("div#header-slider ul li")
-            .apmap { mLink ->
+            .amap { mLink ->
                 val iLink = mLink.attr("onclick").substringAfter("frame('").substringBefore("')")
                 serverUrl = getBaseUrl(iLink)
                 val iMovie = iLink.substringAfter("movie=").substringBefore("&")

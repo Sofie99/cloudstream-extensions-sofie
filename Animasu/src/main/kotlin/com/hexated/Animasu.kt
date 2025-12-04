@@ -4,6 +4,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.*
 import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
@@ -141,10 +142,10 @@ class Animasu : MainAPI() {
     ): Boolean {
         val document = app.get(data).document
         document.select(".mobius > .mirror > option").mapNotNull {
-            fixUrl(
-                Jsoup.parse(base64Decode(it.attr("value"))).select("iframe").attr("src")
-            ) to it.text()
-        }.apmap { (iframe, quality) ->
+                fixUrl(
+                    Jsoup.parse(base64Decode(it.attr("value"))).select("iframe").attr("src")
+                ) to it.text()
+            }.amap { (iframe, quality) ->
             loadFixedExtractor(iframe, quality, "$mainUrl/", subtitleCallback, callback)
         }
         return true

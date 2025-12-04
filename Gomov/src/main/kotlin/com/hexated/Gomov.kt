@@ -3,6 +3,7 @@ package com.hexated
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.httpsify
 import com.lagradost.cloudstream3.utils.loadExtractor
@@ -99,8 +100,7 @@ open class Gomov : MainAPI() {
         val description = document.selectFirst("div[itemprop=description] > p")?.text()?.trim()
         val trailer = document.selectFirst("ul.gmr-player-nav li a.gmr-trailer-popup")?.attr("href")
         val rating =
-            document.selectFirst("div.gmr-meta-rating > span[itemprop=ratingValue]")?.text()
-                ?.toRatingInt()
+            document.selectFirst("div.gmr-meta-rating > span[itemprop=ratingValue]")?.text()?.toIntOrNull()
         val actors = document.select("div.gmr-moviedata").last()?.select("span[itemprop=actors]")
             ?.map { it.select("a").text() }
 
@@ -127,7 +127,7 @@ open class Gomov : MainAPI() {
                 this.year = year
                 this.plot = description
                 this.tags = tags
-                this.rating = rating
+                this.score = Score.from10(rating)
                 addActors(actors)
                 this.recommendations = recommendations
                 addTrailer(trailer)
@@ -138,7 +138,7 @@ open class Gomov : MainAPI() {
                 this.year = year
                 this.plot = description
                 this.tags = tags
-                this.rating = rating
+                this.score = Score.from10(rating)
                 addActors(actors)
                 this.recommendations = recommendations
                 addTrailer(trailer)
@@ -157,17 +157,22 @@ open class Gomov : MainAPI() {
         val id = document.selectFirst("div#muvipro_player_content_id")?.attr("data-id")
 
         if(id.isNullOrEmpty()) {
-            document.select("ul.muvipro-player-tabs li a").apmap { ele ->
-                val iframe = app.get(fixUrl(ele.attr("href"))).document.selectFirst("div.gmr-embed-responsive iframe")
-                    .getIframeAttr()?.let { httpsify(it) } ?: return@apmap
+            document.select("ul.muvipro-player-tabs li a").amap { ele ->
+                val iframe =
+                    app.get(fixUrl(ele.attr("href"))).document.selectFirst("div.gmr-embed-responsive iframe")
+                        .getIframeAttr()?.let { httpsify(it) } ?: return@amap
 
                 loadExtractor(iframe, "$directUrl/", subtitleCallback, callback)
             }
         } else {
-            document.select("div.tab-content-ajax").apmap { ele ->
+            document.select("div.tab-content-ajax").amap { ele ->
                 val server = app.post(
                     "$directUrl/wp-admin/admin-ajax.php",
-                    data = mapOf("action" to "muvipro_player_content", "tab" to ele.attr("id"), "post_id" to "$id")
+                    data = mapOf(
+                        "action" to "muvipro_player_content",
+                        "tab" to ele.attr("id"),
+                        "post_id" to id
+                    )
                 ).document.select("iframe").attr("src").let { httpsify(it) }
 
                 loadExtractor(server, "$directUrl/", subtitleCallback, callback)

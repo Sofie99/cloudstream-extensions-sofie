@@ -5,6 +5,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.Jsoup
@@ -166,7 +167,7 @@ class NontonAnimeIDProvider : MainAPI() {
             this.year = year
             addEpisodes(DubStatus.Subbed, episodes)
             showStatus = status
-            this.rating = rating
+            this.score = Score.from10(rating)
             plot = description
             addTrailer(trailer)
             this.tags = tags
@@ -190,7 +191,7 @@ class NontonAnimeIDProvider : MainAPI() {
             document.select("script#ajax_video-js-extra").attr("src").substringAfter("base64,")
                 .let { Regex("nonce\":\"(\\S+?)\"").find(base64Decode(it))?.groupValues?.get(1) }
 
-        document.select(".container1 > ul > li:not(.boxtab)").apmap {
+        document.select(".container1 > ul > li:not(.boxtab)").amap {
             val dataPost = it.attr("data-post")
             val dataNume = it.attr("data-nume")
             val serverName = it.attr("data-type").lowercase()
@@ -211,7 +212,7 @@ class NontonAnimeIDProvider : MainAPI() {
                     .attr("data-src") else it
             }
 
-            loadExtractor(iframe ?: return@apmap, "$mainUrl/", subtitleCallback, callback)
+            loadExtractor(iframe ?: return@amap, "$mainUrl/", subtitleCallback, callback)
         }
 
         return true

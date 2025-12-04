@@ -4,6 +4,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.httpsify
 import com.lagradost.cloudstream3.utils.loadExtractor
@@ -159,13 +160,13 @@ class AnimeIndoProvider : MainAPI() {
         val document = app.get(data).document
         document.select("div.itemleft > .mirror > option").mapNotNull {
             fixUrl(Jsoup.parse(base64Decode(it.attr("value"))).select("iframe").attr("src"))
-        }.apmap {
-            if (it.startsWith(mainUrl)) {
-                app.get(it, referer = "$mainUrl/").document.select("iframe").attr("src")
-            } else {
-                it
-            }
-        }.apmap {
+        }.amap {
+                if (it.startsWith(mainUrl)) {
+                    app.get(it, referer = "$mainUrl/").document.select("iframe").attr("src")
+                } else {
+                    it
+                }
+            }.amap {
             loadExtractor(httpsify(it), data, subtitleCallback, callback)
         }
 

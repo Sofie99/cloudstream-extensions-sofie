@@ -3,6 +3,7 @@ package com.hexated
 import com.lagradost.cloudstream3.SearchResponse
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.TvType
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.apmap
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.fixUrl
@@ -47,10 +48,14 @@ class KissasianMx : Kissasian() {
     ): Boolean {
 
         val document = app.get(data).document
-        document.select("select#selectServer option").apmap {
+        document.select("select#selectServer option").amap {
             val server = it.attr("value")
-            val iframe = app.get(fixUrl(server ?: return@apmap)).document.selectFirst("div#centerDivVideo iframe")?.attr("src")
-            loadExtractor(iframe ?: return@apmap, "$mainUrl/", subtitleCallback, callback)
+            val iframe = app.get(
+                fixUrl(
+                    server
+                )
+            ).document.selectFirst("div#centerDivVideo iframe")?.attr("src")
+            loadExtractor(iframe ?: return@amap, "$mainUrl/", subtitleCallback, callback)
         }
 
         return true

@@ -4,6 +4,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.nodes.Element
@@ -128,7 +129,7 @@ class NeonimeProvider : MainAPI() {
                 backgroundPosterUrl = tracker?.cover
                 this.year = year
                 plot = document.select("div[itemprop = description]").text().trim()
-                rating = document.select("span[itemprop = ratingValue]").text().toIntOrNull()
+                score = Score.from10(document.select("span[itemprop = ratingValue]").text().toIntOrNull())
                 tags = document.select("p.meta_dd > a").map { it.text() }
                 addTrailer(mTrailer)
                 addMalId(tracker?.malId)
@@ -179,7 +180,7 @@ class NeonimeProvider : MainAPI() {
             }
         }
 
-        source.apmap {
+        source.amap {
             loadExtractor(it, data, subtitleCallback, callback)
         }
 

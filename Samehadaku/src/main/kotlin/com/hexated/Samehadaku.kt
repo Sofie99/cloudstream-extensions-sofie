@@ -4,6 +4,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.loadExtractor
@@ -117,7 +118,7 @@ class Samehadaku : MainAPI() {
                     ?.lowercase()
                     ?: "tv"
             )
-        val rating = document.selectFirst("span.ratingValue")?.text()?.trim()?.toRatingInt()
+        val rating = document.selectFirst("span.ratingValue")?.text()?.trim()?.toIntOrNull()
         val description = document.select("div.desc p").text().trim()
         val trailer = document.selectFirst("div.trailer-anime iframe")?.attr("src")
 
@@ -142,7 +143,7 @@ class Samehadaku : MainAPI() {
             this.year = year
             addEpisodes(DubStatus.Subbed, episodes)
             showStatus = status
-            this.rating = rating
+            this.score = Score.from10(rating)
             plot = description
             addTrailer(trailer)
             this.tags = tags
@@ -162,8 +163,8 @@ class Samehadaku : MainAPI() {
 
         val document = app.get(data).document
 
-        document.select("div#downloadb li").apmap { el ->
-            el.select("a").apmap {
+        document.select("div#downloadb li").amap { el ->
+            el.select("a").amap {
                 loadFixedExtractor(
                     fixUrl(it.attr("href")),
                     el.select("strong").text(),
