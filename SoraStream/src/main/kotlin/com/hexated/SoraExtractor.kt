@@ -608,7 +608,11 @@ object SoraExtractor : SoraStream() {
         tryParseJson<ArrayList<VidFastServers>>(res)?.filter { it.description?.contains("Original audio") == true }
             ?.amapIndexed { index, server ->
                 val source =
-                    app.get("$vidfastAPI/$module/etm5aDvcEsA/${server.data}", referer = "$vidfastAPI/")
+                    app.get("$vidfastAPI/$module/etm5aDvcEsA/${server.data}", referer = "$vidfastAPI/",
+                        headers = mapOf(
+                            "X-Csrf-Token" to "V8mmyuaJMUuox6S6Y8OVt5fdfQOyiZfQ",
+                            "X-Requested-With" to "XMLHttpRequest"
+                        ))
                         .parsedSafe<VidFastSources>()
 
                 callback.invoke(
@@ -857,6 +861,54 @@ object SoraExtractor : SoraStream() {
                     subtitle.file ?: return@map,
                 )
             )
+        }
+
+    }
+
+    suspend fun invokeEleven(
+        tmdbId: Int?,
+        season: Int?,
+        episode: Int?,
+        callback: (ExtractorLink) -> Unit,
+    ) {
+        val path = "fcd552c4321aeac1e62c5304913b3420be75a19d390807281a425aabbb5dc4c0"
+        val url = if(season == null) {
+            "$elevenAPI/movie/$tmdbId"
+        } else {
+            "$elevenAPI/tv/$tmdbId/$season/$episode"
+        }
+
+        val res = app.get(
+            url, interceptor = WebViewResolver(
+                Regex("""$elevenAPI/.*/sr"""),
+                timeout = 15_000L
+            )
+        ).text
+
+        tryParseJson<ArrayList<ElevenServers>>(res)?.amap { server ->
+            val source = app.get(
+                "$elevenAPI/$path/${server.data}",
+                referer = "$elevenAPI/",
+                headers = mapOf(
+                    "Content-Type" to "application/octet-stream",
+                    "X-Requested-With" to "XMLHttpRequest"
+                )
+            ).parsedSafe<ElevenSource>()?.url
+
+            callback.invoke(
+                newExtractorLink(
+                    "Eleven",
+                    "Eleven [${server.name}]",
+                    source ?: return@amap,
+                    INFER_TYPE
+                ) {
+                    this.referer = "${elevenAPI}/"
+                    this.headers = mapOf(
+                        "Origin" to elevenAPI
+                    )
+                }
+            )
+
         }
 
     }

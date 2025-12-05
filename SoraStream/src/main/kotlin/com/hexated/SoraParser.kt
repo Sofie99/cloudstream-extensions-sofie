@@ -17,6 +17,16 @@ data class VixsrcSource(
     val referer: String,
 )
 
+data class ElevenSource(
+    @JsonProperty("url") val url: String? = null,
+)
+
+data class ElevenServers(
+    @JsonProperty("name") val name: String? = null,
+    @JsonProperty("description") val description: String? = null,
+    @JsonProperty("data") val data: String? = null,
+)
+
 data class VidrockSource(
     @JsonProperty("resolution") val resolution: Int? = null,
     @JsonProperty("url") val url: String? = null,

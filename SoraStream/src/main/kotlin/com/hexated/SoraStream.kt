@@ -1,6 +1,7 @@
 package com.hexated
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.hexated.SoraExtractor.invokeEleven
 import com.hexated.SoraExtractor.invokeGomovies
 import com.hexated.SoraExtractor.invokeIdlix
 import com.hexated.SoraExtractor.invokeMapple
@@ -66,6 +67,7 @@ open class SoraStream : TmdbProvider() {
         const val vidsrccxAPI = "https://vidsrc.cx"
         const val superembedAPI = "https://multiembed.mov"
         const val vidrockAPI = "https://vidrock.net"
+        const val elevenAPI = "https://111movies.com"
 
         fun getType(t: String?): TvType {
             return when (t) {
@@ -369,6 +371,14 @@ open class SoraStream : TmdbProvider() {
                     res.season,
                     res.episode,
                     subtitleCallback,
+                    callback
+                )
+            },
+            {
+                invokeEleven(
+                    res.id,
+                    res.season,
+                    res.episode,
                     callback
                 )
             }
