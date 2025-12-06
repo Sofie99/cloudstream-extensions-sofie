@@ -590,7 +590,6 @@ object SoraExtractor : SoraStream() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit,
     ) {
-        val module = "hezushon/6a97ee4f659e63e8ef01a32fb0ecd2a5c70a39e38b09a00a572a75206680ea88/y/1000019099225919/coafeol/e9268f92630bc9d61ab6cf73f182ae3dbc85d420"
         val type = if (season == null) "movie" else "tv"
         val url = if (season == null) {
             "$vidfastAPI/$type/$tmdbId"
@@ -600,15 +599,15 @@ object SoraExtractor : SoraStream() {
 
         val res = app.get(
             url, interceptor = WebViewResolver(
-                Regex("""$vidfastAPI/$module/nOzr"""),
+                Regex("""$vidfastAPI/hezushon/"""),
                 timeout = 15_000L
             )
-        ).text
+        )
 
-        tryParseJson<ArrayList<VidFastServers>>(res)?.filter { it.description?.contains("Original audio") == true }
+        tryParseJson<ArrayList<VidFastServers>>(res.text)?.filter { it.description?.contains("Original audio") == true }
             ?.amapIndexed { index, server ->
                 val source =
-                    app.get("$vidfastAPI/$module/etm5aDvcEsA/${server.data}", referer = "$vidfastAPI/",
+                    app.get("${res.url.substringBeforeLast("/").substringBeforeLast("/")}/HYaF/${server.data}", referer = "$vidfastAPI/",
                         headers = mapOf(
                             "X-Csrf-Token" to "V8mmyuaJMUuox6S6Y8OVt5fdfQOyiZfQ",
                             "X-Requested-With" to "XMLHttpRequest"
