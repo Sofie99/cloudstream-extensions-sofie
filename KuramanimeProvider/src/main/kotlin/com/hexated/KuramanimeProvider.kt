@@ -13,7 +13,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 
 class KuramanimeProvider : MainAPI() {
-    override var mainUrl = "https://kuramanime.club"
+    override var mainUrl = "https://v5.kuramanime.blog"
     override var name = "Kuramanime"
     override val hasQuickSearch = false
     override val hasMainPage = true
@@ -212,8 +212,7 @@ class KuramanimeProvider : MainAPI() {
         cookies = req.cookies
 
         val token = res.selectFirst("meta[name=csrf-token]")?.attr("content") ?: return false
-        val dataKps =
-            res.selectFirst("div.col-lg-12.mt-3")?.attributes()?.last()?.value ?: return false
+        val dataKps = res.selectFirst("div.col-lg-12.mt-3")?.attr("data-kk") ?: return false
 
         val assets = getAssets(dataKps)
 
