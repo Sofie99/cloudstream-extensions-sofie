@@ -11,6 +11,7 @@ import com.lagradost.cloudstream3.utils.loadExtractor
 import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import java.net.URI
 
 class KuramanimeProvider : MainAPI() {
     override var mainUrl = "https://v5.kuramanime.blog"
@@ -231,6 +232,8 @@ class KuramanimeProvider : MainAPI() {
         ).text
 
         headers = mapOf(
+            "Alt-Used" to URI(mainUrl).host,
+            "Authorization" to "Bearer 39F25KMTgDv0EQCqwRF9kBWxcSrHOGKc",
             "X-CSRF-TOKEN" to token,
             "X-Requested-With" to "XMLHttpRequest",
         )
