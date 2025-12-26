@@ -26,13 +26,6 @@ class Moviebox : MainAPI() {
         TvType.AsianDrama
     )
 
-    private val headers = mapOf(
-        "Authorization" to "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjcwNTk4NDI5ODQ4MjEyNDYwOCwiYXRwIjozLCJleHQiOiIxNzY2NzEzMTc5IiwiZXhwIjoxNzc0NDg5MTc5LCJpYXQiOjE3NjY3MTI4Nzl9.6_az9enCjhF5Ba8xql9xe6gBjUcWb5mYUgHbv0OgKRk",
-        "X-Client-Info" to "{\"timezone\":\"Atlantic/Reykjavik\"}",
-        "X-Request-Lang" to "en"
-    )
-
-
     override val mainPage: List<MainPageData> = mainPageOf(
         "872031290915189720" to "Trending Now",
         "997144265920760504" to "Popular Movie",
@@ -223,7 +216,7 @@ class Moviebox : MainAPI() {
             referer = referer
         ).parsedSafe<Media>()?.data?.captions?.map { subtitle ->
             subtitleCallback.invoke(
-                SubtitleFile(
+                newSubtitleFile(
                     subtitle.lanName ?: "",
                     subtitle.url ?: return@map
                 )
