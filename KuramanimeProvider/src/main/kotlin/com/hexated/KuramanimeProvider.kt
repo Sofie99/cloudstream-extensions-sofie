@@ -169,8 +169,9 @@ class KuramanimeProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        val document = app.get(
+        val document = app.post(
             url,
+            data = mapOf("authorization" to "Fvwt41CuqHfaKOyFDSapaS9S9pHz3riT914zM"),
             headers = headers,
             cookies = cookies
         ).document
@@ -232,8 +233,6 @@ class KuramanimeProvider : MainAPI() {
         ).text
 
         headers = mapOf(
-            "Alt-Used" to URI(mainUrl).host,
-            "Authorization" to "Bearer 39F25KMTgDv0EQCqwRF9kBWxcSrHOGKc",
             "X-CSRF-TOKEN" to token,
             "X-Requested-With" to "XMLHttpRequest",
         )
@@ -245,8 +244,9 @@ class KuramanimeProvider : MainAPI() {
             if (server.contains(Regex("(?i)kuramadrive|archive"))) {
                 invokeLocalSource(link, server, headers, subtitleCallback, callback)
             } else {
-                app.get(
+                app.post(
                     link,
+                    data = mapOf("authorization" to "Fvwt41CuqHfaKOyFDSapaS9S9pHz3riT914zM"),
                     referer = data,
                     headers = headers,
                     cookies = cookies
