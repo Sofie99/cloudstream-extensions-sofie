@@ -171,7 +171,7 @@ class KuramanimeProvider : MainAPI() {
     ) {
         val document = app.post(
             url,
-            data = mapOf("authorization" to "Fvwt41CuqHfaKOyFDSapaS9S9pHz3riT914zM"),
+            data = mapOf("authorization" to "oMFsNxBpaT2GEBYwQJBfPIebUiv7JCag"),
             headers = headers,
             cookies = cookies
         ).document
@@ -246,7 +246,7 @@ class KuramanimeProvider : MainAPI() {
             } else {
                 app.post(
                     link,
-                    data = mapOf("authorization" to "Fvwt41CuqHfaKOyFDSapaS9S9pHz3riT914zM"),
+                    data = mapOf("authorization" to "oMFsNxBpaT2GEBYwQJBfPIebUiv7JCag"),
                     referer = data,
                     headers = headers,
                     cookies = cookies
