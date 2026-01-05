@@ -1,4 +1,4 @@
-package com.NontonAnimeIDProvider
+package com.Hexated
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
