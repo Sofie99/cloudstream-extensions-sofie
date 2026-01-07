@@ -7,9 +7,6 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import android.content.Context
 import com.lagradost.cloudstream3.utils.loadExtractor
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -21,11 +18,10 @@ import java.util.Base64
 
 class NontonAnimeIDProvider : MainAPI() {
     override var mainUrl = "https://s7.nontonanimeid.boats"
-    override var name = "NontonAnimeID🦒"
-    override var lang = "id"
-
+    override var name = "NontonAnimeID"
+    override val hasQuickSearch = false
     override val hasMainPage = true
-    override val hasQuickSearch = true
+    override var lang = "id"
     override val hasDownloadSupport = true
     override val supportedTypes = setOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA)
 
@@ -37,7 +33,6 @@ class NontonAnimeIDProvider : MainAPI() {
                 else -> TvType.OVA
             }
         }
-
         fun getStatus(t: String): ShowStatus {
             return when {
                 t.contains("Finished", true) -> ShowStatus.Completed
