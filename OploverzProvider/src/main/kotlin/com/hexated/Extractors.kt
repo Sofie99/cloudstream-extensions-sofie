@@ -3,8 +3,17 @@ package com.hexated
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.extractors.DoodLaExtractor
+import com.lagradost.cloudstream3.extractors.Mp4Upload
 import com.lagradost.cloudstream3.utils.*
 
+class Mp4Upload2() : Mp4Upload() {
+    override var mainUrl = "https://mp4upload.com"
+}
+
+class Doply : DoodLaExtractor() {
+    override var mainUrl = "https://doply.net"
+}
 open class Qiwi : ExtractorApi() {
     override val name = "Qiwi"
     override val mainUrl = "https://qiwi.gg"

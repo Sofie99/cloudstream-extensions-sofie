@@ -11,7 +11,6 @@ import com.lagradost.cloudstream3.utils.loadExtractor
 import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import java.net.URI
 
 class KuramanimeProvider : MainAPI() {
     override var mainUrl = "https://v5.kuramanime.blog"
@@ -21,6 +20,7 @@ class KuramanimeProvider : MainAPI() {
     override var lang = "id"
     override var sequentialMainPage = true
     override val hasDownloadSupport = true
+    var authorization : String? = null
     override val supportedTypes = setOf(
         TvType.Anime,
         TvType.AnimeMovie,
@@ -171,7 +171,7 @@ class KuramanimeProvider : MainAPI() {
     ) {
         val document = app.post(
             url,
-            data = mapOf("authorization" to "oMFsNxBpaT2GEBYwQJBfPIebUiv7JCag"),
+            data = mapOf("authorization" to getAuth()),
             headers = headers,
             cookies = cookies
         ).document
@@ -246,7 +246,7 @@ class KuramanimeProvider : MainAPI() {
             } else {
                 app.post(
                     link,
-                    data = mapOf("authorization" to "oMFsNxBpaT2GEBYwQJBfPIebUiv7JCag"),
+                    data = mapOf("authorization" to getAuth()),
                     referer = data,
                     headers = headers,
                     cookies = cookies
@@ -279,6 +279,20 @@ class KuramanimeProvider : MainAPI() {
             MIX_PAGE_TOKEN_KEY,
             MIX_STREAM_SERVER_KEY
         )
+    }
+
+    suspend fun getAuth() : String {
+        return authorization ?: fetchAuth().also { authorization = it}
+    }
+    suspend fun fetchAuth() : String {
+        val url = "$mainUrl/storage/leviathan.js?v=512"
+        val res = app.get(url).text
+        val auth = Regex("""=\s*\[(.*?)]""").find(res)?.groupValues?.get(1)
+            ?.split(",")
+            ?.map { it.trim().removeSurrounding("'").removeSurrounding("\"") }
+            ?: throw ErrorLoadingException()
+
+        return "${auth.last()}${auth[9]}${auth[1]}${auth.first()}i"
     }
 
     private fun randomId(length: Int = 6): String {
