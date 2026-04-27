@@ -171,7 +171,7 @@ class KuramanimeProvider : MainAPI() {
     ) {
         val document = app.post(
             url,
-            data = mapOf("authorization" to getAuth()),
+            data = mapOf("authorization" to "kJuHHkaqcBFXiGMHQf6bJw8YAyDcwGD8Ur"),
             headers = headers,
             cookies = cookies
         ).document
