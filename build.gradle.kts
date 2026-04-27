@@ -47,7 +47,6 @@ fun Project.android(configuration: LibraryExtension.() -> Unit) {
 
 subprojects {
     apply(plugin = "com.android.library")
-    apply(plugin = "kotlin-android")
     apply(plugin = "com.lagradost.cloudstream3.gradle")
 
     cloudstream {
@@ -74,6 +73,7 @@ subprojects {
             targetCompatibility = JavaVersion.VERSION_1_8
         }
 
+        //noinspection WrongGradleMethod
         tasks.withType<KotlinJvmCompile> {
             compilerOptions {
                 jvmTarget.set(JvmTarget.JVM_1_8)
