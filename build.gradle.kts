@@ -10,10 +10,10 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.7.3")
+        classpath("com.android.tools.build:gradle:9.1.1")
         // Cloudstream gradle plugin which makes everything work and builds plugins
-        classpath("com.github.recloudstream:gradle:-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
+        classpath("com.github.recloudstream:gradle:master-SNAPSHOT")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.21")
     }
 }
 
@@ -46,8 +46,8 @@ subprojects {
 
         defaultConfig {
             minSdk = 21
-            compileSdkVersion(35)
-            targetSdk = 35
+            compileSdkVersion(36)
+            targetSdk = 36
         }
 
         compileOptions {
@@ -68,11 +68,11 @@ subprojects {
     }
 
     dependencies {
-        val apk by configurations
         val implementation by configurations
+        val cloudstream by configurations
 
         // Stubs for all Cloudstream classes
-        apk("com.lagradost:cloudstream3:pre-release")
+        cloudstream("com.lagradost:cloudstream3:pre-release")
 
         // these dependencies can include any of those which are added by the app,
         // but you dont need to include any of them if you dont need them
