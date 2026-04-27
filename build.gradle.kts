@@ -1,5 +1,9 @@
+import com.android.build.api.dsl.LibraryExtension
 import com.lagradost.cloudstream3.gradle.CloudstreamExtension
-import com.android.build.gradle.BaseExtension
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.kotlin.dsl.register
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 buildscript {
     repositories {
@@ -27,7 +31,19 @@ allprojects {
 
 fun Project.cloudstream(configuration: CloudstreamExtension.() -> Unit) = extensions.getByName<CloudstreamExtension>("cloudstream").configuration()
 
-fun Project.android(configuration: BaseExtension.() -> Unit) = extensions.getByName<BaseExtension>("android").configuration()
+fun Project.android(configuration: LibraryExtension.() -> Unit) {
+    extensions.getByName<LibraryExtension>("android").apply {
+        project.extensions.findByType(JavaPluginExtension::class.java)?.apply {
+            // Use Java 17 toolchain even if a higher JDK runs the build.
+            // We still use Java 8 for now which higher JDKs have deprecated.
+            toolchain {
+                languageVersion.set(JavaLanguageVersion.of(17))
+            }
+        }
+
+        configuration()
+    }
+}
 
 subprojects {
     apply(plugin = "com.android.library")
@@ -43,10 +59,13 @@ subprojects {
 
     android {
         namespace = "com.hexated"
+        compileSdk = 36
 
         defaultConfig {
             minSdk = 21
-            compileSdkVersion(36)
+        }
+
+        lint {
             targetSdk = 36
         }
 
@@ -55,14 +74,15 @@ subprojects {
             targetCompatibility = JavaVersion.VERSION_1_8
         }
 
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-            kotlinOptions {
-                jvmTarget = "1.8" // Required
-                // Disables some unnecessary features
-                freeCompilerArgs = freeCompilerArgs +
-                        "-Xno-call-assertions" +
-                        "-Xno-param-assertions" +
-                        "-Xno-receiver-assertions"
+        tasks.withType<KotlinJvmCompile> {
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_1_8)
+                freeCompilerArgs.addAll(
+                    "-Xno-call-assertions",
+                    "-Xno-param-assertions",
+                    "-Xno-receiver-assertions",
+                    "-Xannotation-default-target=param-property"
+                )
             }
         }
     }
@@ -79,7 +99,7 @@ subprojects {
         // https://github.com/recloudstream/cloudstream/blob/master/app/build.gradle
 
         implementation(kotlin("stdlib")) // adds standard kotlin features, like listOf, mapOf etc
-        implementation("com.github.Blatzar:NiceHttp:0.4.13") // http library
+        implementation("com.github.Blatzar:NiceHttp:0.4.18") // http library
         implementation("org.jsoup:jsoup:1.18.3") // html parser
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
         implementation("io.karn:khttp-android:0.1.2")
@@ -89,6 +109,7 @@ subprojects {
     }
 }
 
-task<Delete>("clean") {
-    delete(rootProject.buildDir)
+tasks.register<Delete>("clean") {
+    delete(rootProject.layout.buildDirectory)
 }
+
