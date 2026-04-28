@@ -9,8 +9,10 @@ import com.lagradost.cloudstream3.utils.INFER_TYPE
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.loadExtractor
 import com.lagradost.cloudstream3.utils.newExtractorLink
+import kotlinx.coroutines.delay
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import java.util.concurrent.TimeUnit
 
 class KuramanimeProvider : MainAPI() {
     override var mainUrl = "https://v9.kuramanime.blog"
@@ -20,7 +22,7 @@ class KuramanimeProvider : MainAPI() {
     override var lang = "id"
     override var sequentialMainPage = true
     override val hasDownloadSupport = true
-    var authorization : String? = "KFhElffuFYZZHAqqBqlGewkwbaaFUtJS"
+    var authorization: String? = "kJuHHkaqcBFXiGMHQf6bJw8YAyDcwGD8Ur"
     override val supportedTypes = setOf(
         TvType.Anime,
         TvType.AnimeMovie,
@@ -169,12 +171,14 @@ class KuramanimeProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
-        val document = app.post(
+        val request = app.post(
             url,
-            data = mapOf("authorization" to "kJuHHkaqcBFXiGMHQf6bJw8YAyDcwGD8Ur"),
+            data = mapOf("authorization" to getAuth()),
             headers = headers,
             cookies = cookies
-        ).document
+        )
+        delay(2000)
+        val document = request.document
         document.select("video#player > source").map {
             val link = fixUrl(it.attr("src"))
             val quality = it.attr("size").toIntOrNull()
@@ -226,11 +230,14 @@ class KuramanimeProvider : MainAPI() {
             "X-Requested-With" to "XMLHttpRequest",
         )
 
-        val tokenKey = app.get(
+        val tokenRes = app.get(
             "$mainUrl/${assets.MIX_PREFIX_AUTH_ROUTE_PARAM}${assets.MIX_AUTH_ROUTE_PARAM}",
             headers = headers,
             cookies = cookies
-        ).text
+        )
+
+        val tokenKey = tokenRes.text
+        cookies = tokenRes.cookies
 
         headers = mapOf(
             "X-CSRF-TOKEN" to token,
@@ -244,13 +251,15 @@ class KuramanimeProvider : MainAPI() {
             if (server.contains(Regex("(?i)kuramadrive|archive"))) {
                 invokeLocalSource(link, server, headers, subtitleCallback, callback)
             } else {
-                app.post(
+                val request = app.post(
                     link,
                     data = mapOf("authorization" to getAuth()),
                     referer = data,
                     headers = headers,
                     cookies = cookies
-                ).document.select("div.iframe-container iframe").attr("src").let { videoUrl ->
+                )
+                delay(2000)
+                request.document.select("div.iframe-container iframe").attr("src").let { videoUrl ->
                     loadExtractor(fixUrl(videoUrl), "$mainUrl/", subtitleCallback, callback)
                 }
             }
@@ -281,10 +290,11 @@ class KuramanimeProvider : MainAPI() {
         )
     }
 
-    suspend fun getAuth() : String {
-        return authorization ?: fetchAuth().also { authorization = it}
+    suspend fun getAuth(): String {
+        return authorization ?: fetchAuth().also { authorization = it }
     }
-    suspend fun fetchAuth() : String {
+
+    suspend fun fetchAuth(): String {
         val url = "$mainUrl/storage/leviathan.js?v=512"
         val res = app.get(url).text
         val auth = Regex("""=\s*\[(.*?)]""").find(res)?.groupValues?.get(1)
