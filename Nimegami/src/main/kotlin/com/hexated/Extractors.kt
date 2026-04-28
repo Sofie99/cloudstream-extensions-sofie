@@ -93,3 +93,37 @@ open class Videogami : ExtractorApi() {
     }
 
 }
+
+open class Halahgan : ExtractorApi() {
+    override val name = "Halahgan"
+    override val mainUrl = "https://stordl.halahgan.com"
+    override val requiresReferer = false
+
+    override suspend fun getUrl(
+        url: String,
+        referer: String?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ) {
+        val id = url.substringAfterLast("/").substringBefore("?").trim()
+
+        val video = app.get("$mainUrl/streaming//$id?action=stream-url&id=$id", referer = "$mainUrl/").parsedSafe<Source>()?.url
+
+        callback.invoke(
+            newExtractorLink(
+                this.name,
+                this.name,
+                video ?: return
+            ) {
+                this.referer = "$mainUrl/"
+                this.headers = mapOf("Range" to "bytes=0-")
+            }
+        )
+
+    }
+
+    private data class Source(
+        @JsonProperty("url") val url: String,
+    )
+
+}

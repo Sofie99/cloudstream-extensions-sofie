@@ -214,7 +214,7 @@ class Samehadaku : MainAPI() {
     }
 
     private fun String.removeBloat(): String {
-        return this.replace(Regex("(Nonton)|(Anime)|(Subtitle\\sIndonesia)"), "").trim()
+        return this.replace(Regex("(Nonton)|(Anime)|(Subtitle\\sIndonesia)|(Sub\\sIndo)"), "").trim()
     }
 
 }

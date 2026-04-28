@@ -13,5 +13,6 @@ class NimegamiPlugin: Plugin() {
         registerExtractorAPI(Mitedrive())
         registerExtractorAPI(Berkasdrive())
         registerExtractorAPI(Videogami())
+        registerExtractorAPI(Halahgan())
     }
 }
