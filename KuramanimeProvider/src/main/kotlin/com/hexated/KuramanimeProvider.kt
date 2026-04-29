@@ -189,12 +189,12 @@ class KuramanimeProvider : MainAPI() {
                     link,
                     INFER_TYPE
                 ) {
-                    this.headers = mapOf(
-                        "Accept" to "video/webm,video/ogg,video/*;q=0.9,application/ogg;q=0.7,audio/*;q=0.6,*/*;q=0.5",
-                        "Range" to "bytes=0-",
-                        "Sec-Fetch-Dest" to "video",
-                        "Sec-Fetch-Mode" to "no-cors",
-                    )
+//                    this.headers = mapOf(
+//                        "Accept" to "video/webm,video/ogg,video/*;q=0.9,application/ogg;q=0.7,audio/*;q=0.6,*/*;q=0.5",
+//                        "Range" to "bytes=0-",
+//                        "Sec-Fetch-Dest" to "video",
+//                        "Sec-Fetch-Mode" to "no-cors",
+//                    )
                     this.quality = quality ?: Qualities.Unknown.value
                 }
             )
