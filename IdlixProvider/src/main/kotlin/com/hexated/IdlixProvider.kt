@@ -9,7 +9,10 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import com.lagradost.cloudstream3.utils.AppUtils
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.INFER_TYPE
 import com.lagradost.cloudstream3.utils.M3u8Helper.Companion.generateM3u8
+import com.lagradost.cloudstream3.utils.Qualities
+import com.lagradost.cloudstream3.utils.newExtractorLink
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.text.Normalizer
@@ -42,7 +45,11 @@ class IdlixProvider : MainAPI() {
         request: MainPageRequest
     ): HomePageResponse {
         val url = if (request.data.contains("%d")) request.data.format(page) else request.data
-        val res = app.get(url, timeout = 10000L).parsedSafe<ApiResponse>() ?: return newHomePageResponse(request.name, emptyList())
+        val res =
+            app.get(url, timeout = 10000L).parsedSafe<ApiResponse>() ?: return newHomePageResponse(
+                request.name,
+                emptyList()
+            )
         val home = res.data.map { item ->
             val title = item.title ?: "UnKnown"
             val poster = item.posterPath?.let { "https://image.tmdb.org/t/p/w342$it" }
@@ -68,7 +75,7 @@ class IdlixProvider : MainAPI() {
         return newHomePageResponse(request.name, home)
     }
 
-    override suspend fun quickSearch(query: String): List<SearchResponse>? = search(query,1)?.items
+    override suspend fun quickSearch(query: String): List<SearchResponse>? = search(query, 1)?.items
 
     override suspend fun search(query: String, page: Int): SearchResponseList? {
         val url = "$mainUrl/api/search?q=$query&page=$page&limit=8"
@@ -121,7 +128,7 @@ class IdlixProvider : MainAPI() {
             ?.toIntOrNull()
 
         val tags = data.genres?.mapNotNull { it.name } ?: emptyList()
-        val logourl = "https://image.tmdb.org/t/p/w500"+data.logoPath
+        val logourl = "https://image.tmdb.org/t/p/w500" + data.logoPath
         val actors = data.cast?.map {
             Actor(it.name ?: "", it.profilePath?.let { p -> "https://image.tmdb.org/t/p/w185$p" })
         } ?: emptyList()
@@ -175,10 +182,12 @@ class IdlixProvider : MainAPI() {
 
             data.firstSeason?.episodes?.forEach { ep ->
                 episodes.add(
-                    newEpisode( LoadData(
-                        id = ep.id ?: return@forEach,
-                        type = "episode"
-                    ).toJson()) {
+                    newEpisode(
+                        LoadData(
+                            id = ep.id ?: return@forEach,
+                            type = "episode"
+                        ).toJson()
+                    ) {
                         this.name = ep.name
                         this.season = data.firstSeason.seasonNumber
                         this.episode = ep.episodeNumber
@@ -205,10 +214,12 @@ class IdlixProvider : MainAPI() {
 
                 seasonData?.episodes?.forEach { ep ->
                     episodes.add(
-                        newEpisode( LoadData(
-                            id = ep.id ?: return@forEach,
-                            type = "episode"
-                        ).toJson()) {
+                        newEpisode(
+                            LoadData(
+                                id = ep.id ?: return@forEach,
+                                type = "episode"
+                            ).toJson()
+                        ) {
                             this.name = ep.name
                             this.season = seasonNum
                             this.episode = ep.episodeNumber
@@ -216,7 +227,8 @@ class IdlixProvider : MainAPI() {
                             this.runTime = ep.runtime
                             this.score = Score.from10(ep.voteAverage?.toString())
                             addDate(ep.airDate)
-                            this.posterUrl = ep.stillPath?.let { "https://image.tmdb.org/t/p/w300$it" }
+                            this.posterUrl =
+                                ep.stillPath?.let { "https://image.tmdb.org/t/p/w300$it" }
                         }
                     )
                 }
@@ -237,10 +249,12 @@ class IdlixProvider : MainAPI() {
                 this.recommendations = recommendations
             }
         } else {
-            newMovieLoadResponse(title, url, TvType.Movie,  LoadData(
-                id = data.id ?: "",
-                type = "movie"
-            ).toJson()) {
+            newMovieLoadResponse(
+                title, url, TvType.Movie, LoadData(
+                    id = data.id ?: "",
+                    type = "movie"
+                ).toJson()
+            ) {
                 this.posterUrl = poster
                 this.backgroundPosterUrl = backdrop
                 this.logoUrl = logourl
@@ -289,7 +303,16 @@ class IdlixProvider : MainAPI() {
         iframeResponse?.let { iframe ->
             iframe.url.takeIf { it.isNotBlank() }
                 ?.let { streamUrl ->
-                    generateM3u8(name, streamUrl, mainUrl).forEach(callback)
+                    callback.invoke(
+                        newExtractorLink(
+                            name,
+                            name,
+                            streamUrl,
+                            INFER_TYPE
+                        ) {
+                            this.referer = mainUrl
+                        }
+                    )
                 }
 
             iframe.subtitles.forEach { subtitle ->
@@ -316,10 +339,16 @@ class IdlixProvider : MainAPI() {
             Regex("\\b(cam)\\b", RegexOption.IGNORE_CASE) to SearchQuality.Cam,
 
             // WEB / RIP
-            Regex("\\b(web[- ]?dl|webrip|webdl)\\b", RegexOption.IGNORE_CASE) to SearchQuality.WebRip,
+            Regex(
+                "\\b(web[- ]?dl|webrip|webdl)\\b",
+                RegexOption.IGNORE_CASE
+            ) to SearchQuality.WebRip,
 
             // BLURAY
-            Regex("\\b(bluray|bdrip|blu[- ]?ray)\\b", RegexOption.IGNORE_CASE) to SearchQuality.BlueRay,
+            Regex(
+                "\\b(bluray|bdrip|blu[- ]?ray)\\b",
+                RegexOption.IGNORE_CASE
+            ) to SearchQuality.BlueRay,
 
             // RESOLUTIONS
             Regex("\\b(1440p|qhd)\\b", RegexOption.IGNORE_CASE) to SearchQuality.BlueRay,
@@ -530,6 +559,7 @@ class IdlixProvider : MainAPI() {
     data class SolveResponse(
         val embedUrl: String? = null
     )
+
     data class LoadData(
         val id: String,
         val type: String // "movie" or "episode"
