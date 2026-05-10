@@ -9,6 +9,7 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import com.lagradost.cloudstream3.utils.AppUtils
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.INFER_TYPE
 import com.lagradost.cloudstream3.utils.M3u8Helper.Companion.generateM3u8
 import com.lagradost.cloudstream3.utils.Qualities
@@ -308,7 +309,7 @@ class IdlixProvider : MainAPI() {
                             name,
                             name,
                             streamUrl,
-                            INFER_TYPE
+                            ExtractorLinkType.M3U8
                         ) {
                             this.referer = mainUrl
                         }
