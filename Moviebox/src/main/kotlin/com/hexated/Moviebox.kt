@@ -92,7 +92,7 @@ class Moviebox : MainAPI() {
 
     override suspend fun search(query: String): List<SearchResponse> {
         return app.post(
-            "$secondAPIUrl/wefeed-h5api-bff/subject/search", requestBody = mapOf(
+            "$mainAPIUrl/wefeed-h5api-bff/subject/search", requestBody = mapOf(
                 "keyword" to query,
                 "page" to "1",
                 "perPage" to "28",
