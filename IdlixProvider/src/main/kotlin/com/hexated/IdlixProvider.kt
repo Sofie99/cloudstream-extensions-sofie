@@ -116,7 +116,6 @@ class IdlixProvider : MainAPI() {
 
     override suspend fun load(url: String): LoadResponse {
         val response = app.get(url, timeout = 10000L)
-
         val data = response.parsedSafe<DetailResponse>()
             ?: throw ErrorLoadingException("Invalid JSON")
 
