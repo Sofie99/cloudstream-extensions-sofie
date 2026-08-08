@@ -14,6 +14,7 @@ class Moviebox : MainAPI() {
     override var mainUrl = "https://moviebox.ph"
     private val mainAPIUrl = "https://h5-api.aoneroom.com"
     private val secondAPIUrl = "https://filmboom.top"
+    private val bearer = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjE3NzQ5NDY5OTEwMzkwNDc2NzIsImF0cCI6MywiZXh0IjoiMTc4NjE3MDU5NCIsImV4cCI6MTc5Mzk0NjU5NCwiaWF0IjoxNzg2MTcwMjk0fQ.TuMIbcAw2OAvm_K4-jrf-vkRhQV8raBDeAaC-YF5_yA"
     override val instantLinkLoading = true
     override var name = "Moviebox"
     override val hasMainPage = true
@@ -92,12 +93,14 @@ class Moviebox : MainAPI() {
 
     override suspend fun search(query: String): List<SearchResponse> {
         return app.post(
-            "$mainAPIUrl/wefeed-h5api-bff/subject/search", requestBody = mapOf(
+            "$mainAPIUrl/wefeed-h5api-bff/subject/search", data = mapOf(
                 "keyword" to query,
                 "page" to "1",
                 "perPage" to "28",
                 "subjectType" to "0",
-            ).toJson().toRequestBody(RequestBodyTypes.JSON.toMediaTypeOrNull())
+            ), headers = mapOf(
+                "authorization" to bearer
+            )
         ).parsedSafe<Media>()?.data?.items?.map { it.toSearchResponse(this) }
             ?: throw ErrorLoadingException()
     }
