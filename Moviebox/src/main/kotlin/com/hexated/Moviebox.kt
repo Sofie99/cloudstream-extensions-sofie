@@ -89,21 +89,37 @@ class Moviebox : MainAPI() {
         return newHomePageResponse(request.name, home)
     }
 
-    override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)
+    override suspend fun quickSearch(query: String): List<SearchResponse>? = search(query)
 
-    override suspend fun search(query: String): List<SearchResponse> {
-        return app.post(
+    override suspend fun search(query: String, page: Int): SearchResponseList? {
+        val searchs = mutableListOf<SearchResponse>()
+        val data = app.post(
             "$mainAPIUrl/wefeed-h5api-bff/subject/search", data = mapOf(
                 "keyword" to query,
-                "page" to "1",
+                "page" to "$page",
                 "perPage" to "28",
                 "subjectType" to "0",
             ), headers = mapOf(
                 "authorization" to bearer
             )
-        ).parsedSafe<Media>()?.data?.items?.map { it.toSearchResponse(this) }
-            ?: throw ErrorLoadingException()
+        ).parsedSafe<Media>()?.data?.items?.map { it.toSearchResponse(this) } ?: emptyList()
+        searchs.addAll(data)
+        return newSearchResponseList(searchs, true)
     }
+
+//    override suspend fun search(query: String): List<SearchResponse> {
+//        return app.post(
+//            "$mainAPIUrl/wefeed-h5api-bff/subject/search", data = mapOf(
+//                "keyword" to query,
+//                "page" to "1",
+//                "perPage" to "28",
+//                "subjectType" to "0",
+//            ), headers = mapOf(
+//                "authorization" to bearer
+//            )
+//        ).parsedSafe<Media>()?.data?.items?.map { it.toSearchResponse(this) }
+//            ?: throw ErrorLoadingException()
+//    }
 
     override suspend fun load(url: String): LoadResponse {
         val id = url.substringAfterLast("/")
