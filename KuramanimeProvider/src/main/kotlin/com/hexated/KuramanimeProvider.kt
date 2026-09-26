@@ -118,7 +118,7 @@ class KuramanimeProvider : MainAPI() {
 
         val episodes = mutableListOf<Episode>()
 
-        for (i in 1..30) {
+        for (i in 1..50) {
             val doc = app.get("$url?page=$i").document
             val eps = Jsoup.parse(doc.select("#episodeLists").attr("data-content"))
                 .select("a.btn.btn-sm.btn-danger")
