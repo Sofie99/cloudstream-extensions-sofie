@@ -18,7 +18,6 @@ class Moviebox : MainAPI() {
     override val instantLinkLoading = true
     override var name = "Moviebox"
     override val hasMainPage = true
-    override val hasQuickSearch = true
     override var lang = "en"
     override val supportedTypes = setOf(
         TvType.Movie,
