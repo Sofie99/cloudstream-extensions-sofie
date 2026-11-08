@@ -14,7 +14,7 @@ class Moviebox : MainAPI() {
     override var mainUrl = "https://moviebox.ph"
     private val mainAPIUrl = "https://h5-api.aoneroom.com"
     private val secondAPIUrl = "https://filmboom.top"
-    private val bearer = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjE3NzQ5NDY5OTEwMzkwNDc2NzIsImF0cCI6MywiZXh0IjoiMTc4NjE3MDU5NCIsImV4cCI6MTc5Mzk0NjU5NCwiaWF0IjoxNzg2MTcwMjk0fQ.TuMIbcAw2OAvm_K4-jrf-vkRhQV8raBDeAaC-YF5_yA"
+    private val bearer = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUzMTY3MDc4NzgwODkyNDg0NjQsImF0cCI6MywiZXh0IjoiMTc5NDExNTM3OCIsImV4cCI6MTgwMTg5MTM3OCwiaWF0IjoxNzk0MTE1MDc4fQ.OBEkjTAM-gch6oko4aw8Rj1tkK-mgT8FbUX7aPD9fBg"
     override val instantLinkLoading = true
     override var name = "Moviebox"
     override val hasMainPage = true
@@ -88,8 +88,6 @@ class Moviebox : MainAPI() {
 
         return newHomePageResponse(request.name, home)
     }
-
-    override suspend fun quickSearch(query: String): List<SearchResponse>? = search(query)
 
     override suspend fun search(query: String, page: Int): SearchResponseList? {
         val searchs = mutableListOf<SearchResponse>()
