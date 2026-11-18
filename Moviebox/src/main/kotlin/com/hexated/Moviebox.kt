@@ -121,7 +121,7 @@ class Moviebox : MainAPI() {
 
     override suspend fun load(url: String): LoadResponse {
         val id = url.substringAfterLast("/")
-        val document = app.get("$secondAPIUrl/wefeed-h5-bff/web/subject/detail?subjectId=$id")
+        val document = app.get("$mainAPIUrl/wefeed-h5api-bff/detail?detailPath=$id")
             .parsedSafe<MediaDetail>()?.data
         val subject = document?.subject
         val title = subject?.title ?: ""
@@ -318,7 +318,7 @@ class Moviebox : MainAPI() {
         fun toSearchResponse(provider: Moviebox): SearchResponse {
             return provider.newMovieSearchResponse(
                 title ?: "",
-                subjectId ?: "",
+                detailPath ?: "",
                 if (subjectType == 1) TvType.Movie else TvType.TvSeries,
                 false
             ) {
